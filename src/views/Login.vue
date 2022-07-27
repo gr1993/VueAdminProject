@@ -1,13 +1,18 @@
 <template>
-  <div>
-    <h2>Longest LogIn</h2>
-    <form @submit="onSubmit">
-      <input placeholder="Enter your email" v-model="email">
-      <input placeholder="Enter your password" v-model="password">
-      <button type="submit">Login</button>
-    </form>
-    <button @click="onSubmit">Test</button>
-  </div>
+
+  <v-container
+    fluid
+  >
+    <div>
+      <h2>Longest LogIn</h2>
+      <form @submit="onSubmit">
+        <input placeholder="Enter your email" v-model="email">
+        <input placeholder="Enter your password" v-model="password">
+        <button type="submit">Login</button>
+      </form>
+      <button @click="onSubmit">Test</button>
+    </div>
+  </v-container>
 </template>
 
 
