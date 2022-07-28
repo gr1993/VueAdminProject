@@ -15,11 +15,11 @@
 		<v-navigation-drawer v-model="drawer" app>
 			<v-list-item>
 				<v-list-item-content>
-					<v-list-item-title class="text-h6">
-						Application
+					<v-list-item-title class="text-h5">
+						롱기스트
 					</v-list-item-title>
 					<v-list-item-subtitle>
-						subtext
+						어드민
 					</v-list-item-subtitle>
 				</v-list-item-content>
 			</v-list-item>
@@ -65,8 +65,7 @@ export default {
     return {
       drawer:true,
       items: [
-        { title: 'Home', icon: 'mdi-view-dashboard', to: '/' },
-        { title: 'Photos', icon: 'mdi-image', to: '/admin/view' },
+        { title: '사용자', icon: 'mdi-account', to: '/' },
       ],
       right: null,
     }
