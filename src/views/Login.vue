@@ -80,7 +80,7 @@ export default {
       }, {})
 
       // 리다이렉트 처리
-      this.$router.push(returnPath);
+      this.$router.push(returnPath || '/');
     }
 	}
 }
