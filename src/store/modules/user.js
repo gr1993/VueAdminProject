@@ -30,7 +30,7 @@ const userStore = {
 	},
 	actions: {
 		LOGIN: async function ({ commit }, { email, password }) {
-			const { data } = await axios.post(`${hostname}/login`, { email, password })
+			const { data } = await axios.post(`${hostname}/users/login`, { email, password })
 			
 			if(data.isSuccess) {
 				commit("LOGIN", data.data);
