@@ -9,16 +9,24 @@
 
       <v-spacer />
     </v-app-bar>
-    <Main/>
+    <Main v-if="isLogin"/>
+    <Login v-if="!isLogin"/>
   </v-app>
 </template>
 
 <script>
 import Main from './views/Main.vue'
+import Login from './views/Login.vue'
 
 export default {
   components: {
-    Main
+    Main,
+    Login
   },
+  data() {
+    return {
+      isLogin: false,
+    }
+  }
 }
 </script>
