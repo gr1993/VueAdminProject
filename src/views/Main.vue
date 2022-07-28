@@ -2,6 +2,16 @@
   <v-container
     fluid
   >
+		<v-app-bar
+      app
+      color="primary"
+      dark
+    >
+			<v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+
+			<v-spacer />
+    </v-app-bar>
+		
 		<v-navigation-drawer v-model="drawer" app>
 			<v-list-item>
 				<v-list-item-content>
