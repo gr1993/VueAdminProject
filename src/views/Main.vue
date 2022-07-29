@@ -78,7 +78,7 @@ export default {
     return {
       drawer:true,
       items: [
-        { title: '사용자', icon: 'mdi-account', to: '/' },
+        { title: '사용자', icon: 'mdi-account', to: '/admin/user' },
       ],
       right: null,
     }

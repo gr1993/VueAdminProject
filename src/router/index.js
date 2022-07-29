@@ -21,7 +21,14 @@ const routes = [
     path: '/',
     name: 'main',
     component: MainView,
-    beforeEnter: requireAuth('/')
+    beforeEnter: requireAuth('/'),
+    children: [
+      {
+        path: '/admin/user',
+        name: 'user',
+        component: () => import(/* webpackChunkName: "about" */ '../views/User.vue')
+      }
+    ]
   },
   {
     path: '/admin/view',
