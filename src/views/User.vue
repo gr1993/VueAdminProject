@@ -79,13 +79,11 @@ export default {
           text: 'Dessert (100g serving)',
           align: 'left',
           sortable: false,
-          value: 'name',
-          //filter: this.nameFilter,
+          value: 'name'
         },
         {
           text: 'Calories',
-          value: 'calories',
-          //filter: this.caloriesFilter,
+          value: 'calories'
         },
         { text: 'Fat (g)', value: 'fat' },
         { text: 'Carbs (g)', value: 'carbs' },
@@ -95,28 +93,11 @@ export default {
     },
   },
   methods: {
-    nameFilter(value) {
-      if (!this.dessertFilterValue) {
-        return true;
-      }
-
-      return value
-        .toLowerCase()
-        .includes(this.dessertFilterValue.toLowerCase());
-    },
-
-    caloriesFilter(value) {
-      if (!this.caloriesFilterValue) {
-        return true;
-      }
-
-      return value === this.caloriesFilterValue;
-    },
-
-    onSubmit() {
+    SearchUsers() {
       alert(this.dessertFilterValue);
       alert(this.caloriesFilterValue);
     },
+    
   },
 };
 </script>
