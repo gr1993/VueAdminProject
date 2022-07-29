@@ -15,12 +15,25 @@
 		<v-navigation-drawer v-model="drawer" app>
 			<v-list-item>
 				<v-list-item-content>
-					<v-list-item-title class="text-h5">
-						롱기스트
-					</v-list-item-title>
-					<v-list-item-subtitle>
-						어드민
-					</v-list-item-subtitle>
+					<v-row>
+						<v-col cols="4">
+							<v-img
+								class="float-left"
+								max-height="50"
+								max-width="70"
+								src="../assets/logo.png"
+							>
+							</v-img>
+						</v-col>
+						<v-col cols="8">
+							<v-list-item-title class="text-h5">
+								롱기스트
+							</v-list-item-title>
+							<v-list-item-subtitle>
+								어드민
+							</v-list-item-subtitle>
+						</v-col>
+					</v-row>
 				</v-list-item-content>
 			</v-list-item>
 
