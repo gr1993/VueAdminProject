@@ -1,154 +1,136 @@
 <template>
-    <v-layout row wrap>
+  <v-data-table
+    :headers="headers"
+    :items="desserts"
+    item-key="name"
+    class="elevation-1 pa-6"
+  >
+    <template v-slot:top>
+      <!-- v-container, v-col and v-row are just for decoration purposes. -->
+      <v-container fluid>
+        <v-row class="searchRow">
+          <v-col cols="5">
+            <v-row class="pa-6">
+              <!-- Filter for dessert name-->
+              <v-text-field
+                v-model="dessertFilterValue"
+                type="text"
+                label="Name"
+              ></v-text-field>
+            </v-row>
+          </v-col>
 
-        <v-flex xs6>
-            <v-text-field
-                    append-icon="search"
-                    label="Filter"
-                    single-line
-                    hide-details
-                    @input="filterSearch"
-            ></v-text-field>
-        </v-flex>
+          <v-col cols="5">
+            <v-row class="pa-6">
+              <!-- Filter for calories -->
+              <v-select
+                :items="caloriesList"
+                v-model="caloriesFilterValue"
+                label="Calories"
+              ></v-select>
+            </v-row>
+          </v-col>
 
-        <v-flex xs6>
-            <v-select
-                    :items="authors"
-                    label="Author"
-                    @change="filterAuthor"
-            ></v-select>
-        </v-flex>
-
-
-        <v-flex xs12>
-
-
-            <v-data-table
-                    :headers="headers"
-                    :items="rows"
-                    item-key="name"
-
-                    :search="filters"
-                    :custom-filter="customFilter"
-            >
-                <template slot="headers" slot-scope="props">
-                    <tr>
-                        <th v-for="header in props.headers" :key="header.text">
-                            {{ header.text }}
-                        </th>
-                    </tr>
-                </template>
-
-                <template slot="items" slot-scope="props">
-                    <tr>
-                        <td>{{ props.item.name }}</td>
-                        <td>{{ props.item.added_by }}</td>
-                    </tr>
-                </template>
-
-            </v-data-table>
-
-        </v-flex>
-
-
-    </v-layout>
+          <v-col cols="2" class="centered">
+            <v-btn color="secondary" class="searchButton" @click="onSubmit">
+              검색
+            </v-btn>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="10"> </v-col>
+          <v-col cols="2">
+            <v-row>
+              <v-col cols="6"> </v-col>
+              <v-col cols="6">
+                <v-btn color="green" @click="onSubmit"> 수정 </v-btn>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-container>
+    </template>
+  </v-data-table>
 </template>
 
 <script>
-  export default {
-    name: "UserView",
-    data: () => ({
-      filters: {
-        search: '',
-        added_by: '',
-      },
+import tableData from './sampleDataTable';
 
-      authors: ['Admin', 'Editor'],
-      headers: [
-        {
-          text: 'Names',
-          align: 'left',
-          value: 'name',
-          sortable: false
-        },
-        {
-          text: 'Item addad by',
-          value: 'added_by',
-          align: 'left',
-          sortable: false
-        }
+export default {
+  name: 'UserView',
+  data() {
+    return {
+      caloriesList: [
+        { text: 'All', value: null },
+        { text: 'Only 237', value: 237 },
+        { text: 'Only 305', value: 305 },
       ],
-      rows: [
+
+      dessertFilterValue: '',
+      caloriesFilterValue: null,
+
+      desserts: tableData.data,
+    };
+  },
+  computed: {
+    headers() {
+      return [
         {
-          name: 'Marcelo Tosco',
-          added_by: 'admin'
+          text: 'Dessert (100g serving)',
+          align: 'left',
+          sortable: false,
+          value: 'name',
+          //filter: this.nameFilter,
         },
         {
-          name: 'Carlos Campos',
-          added_by: 'admin'
+          text: 'Calories',
+          value: 'calories',
+          //filter: this.caloriesFilter,
         },
-        {
-          name: 'Luis Gonzalez',
-          added_by: 'Editor'
-        },
-        {
-          name: 'Keopx',
-          added_by: 'Editor'
-        },
-        {
-          name: 'Marco Marocchi',
-          added_by: 'Admin'
-        },
+        { text: 'Fat (g)', value: 'fat' },
+        { text: 'Carbs (g)', value: 'carbs' },
+        { text: 'Protein (g)', value: 'protein' },
+        { text: 'Iron (%)', value: 'iron' },
+      ];
+    },
+  },
+  methods: {
+    nameFilter(value) {
+      if (!this.dessertFilterValue) {
+        return true;
+      }
 
-      ]
-    }),
+      return value
+        .toLowerCase()
+        .includes(this.dessertFilterValue.toLowerCase());
+    },
 
-    methods: {
+    caloriesFilter(value) {
+      if (!this.caloriesFilterValue) {
+        return true;
+      }
 
-      customFilter(items, filters, filter, headers) {
-        // Init the filter class.
-        const cf = new this.$MultiFilters(items, filters, filter, headers);
+      return value === this.caloriesFilterValue;
+    },
 
-        cf.registerFilter('search', function (searchWord, items) {
-          if (searchWord.trim() === '') return items;
-
-          return items.filter(item => {
-            return item.name.toLowerCase().includes(searchWord.toLowerCase());
-          }, searchWord);
-
-        });
-
-
-        cf.registerFilter('added_by', function (added_by, items) {
-          if (added_by.trim() === '') return items;
-
-          return items.filter(item => {
-            return item.added_by.toLowerCase() === added_by.toLowerCase();
-          }, added_by);
-
-        });
-
-        // Its time to run all created filters.
-        // Will be executed in the order thay were defined.
-        return cf.runFilters();
-      },
-
-
-      /**
-       * Handler when user input something at the "Filter" text field.
-       */
-      filterSearch(val) {
-        this.filters = this.$MultiFilters.updateFilters(this.filters, {search: val});
-      },
-
-      /**
-       * Handler when user  select some author at the "Author" select.
-       */
-      filterAuthor(val) {
-        this.filters = this.$MultiFilters.updateFilters(this.filters, {added_by: val});
-      },
-
-    }
-
-  };
+    onSubmit() {
+      alert(this.dessertFilterValue);
+      alert(this.caloriesFilterValue);
+    },
+  },
+};
 </script>
+
+<style>
+.centered {
+  text-align: center;
+  padding-top: 35px;
+}
+.searchRow {
+  height: 85px;
+}
+.searchButton {
+  width: 100px;
+  height: 60px;
+}
+</style>
