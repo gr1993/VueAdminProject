@@ -4,6 +4,10 @@
     :items="desserts"
     item-key="name"
     class="elevation-1 pa-6"
+    :footer-props="{
+      'items-per-page-options':[10],
+      'disable-items-per-page': true,
+    }"
   >
     <template v-slot:top>
       <!-- v-container, v-col and v-row are just for decoration purposes. -->

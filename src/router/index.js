@@ -27,6 +27,11 @@ const routes = [
         path: '/admin/user',
         name: 'user',
         component: () => import(/* webpackChunkName: "about" */ '../views/User.vue')
+      },
+      {
+        path: '/admin/holeinone/reward',
+        name: 'holeInOneReward',
+        component: () => import(/* webpackChunkName: "about" */ '../views/HoleInOneReward.vue')
       }
     ]
   },
