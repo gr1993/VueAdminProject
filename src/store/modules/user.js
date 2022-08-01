@@ -7,6 +7,7 @@ const enhanceAccessToken = () => {
   if (!accessToken) return;
   axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 };
+enhanceAccessToken();
 
 const userStore = {
   namespaced: true,

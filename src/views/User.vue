@@ -1,42 +1,54 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="desserts"
-    item-key="name"
+    :items="usersData"
+    item-key="id"
     class="elevation-1 pa-6"
     :footer-props="{
-      'items-per-page-options':[10],
+      'items-per-page-options': [10],
       'disable-items-per-page': true,
     }"
   >
     <template v-slot:top>
-      <!-- v-container, v-col and v-row are just for decoration purposes. -->
       <v-container fluid>
         <v-row class="searchRow">
-          <v-col cols="5">
+          <v-col cols="3">
             <v-row class="pa-6">
-              <!-- Filter for dessert name-->
               <v-text-field
-                v-model="dessertFilterValue"
+                v-model="filters.email"
                 type="text"
-                label="Name"
+                label="이메일"
               ></v-text-field>
             </v-row>
           </v-col>
 
-          <v-col cols="5">
+          <v-col cols="2">
+            <v-row class="pa-6">
+              <v-text-field
+                v-model="filters.name"
+                type="text"
+                label="이름"
+              ></v-text-field>
+            </v-row>
+          </v-col>
+
+          <v-col cols="3">
             <v-row class="pa-6">
               <!-- Filter for calories -->
               <v-select
-                :items="caloriesList"
-                v-model="caloriesFilterValue"
-                label="Calories"
+                :items="userTypeList"
+                v-model="filters.is_admin"
+                label="관리자 여부"
               ></v-select>
             </v-row>
           </v-col>
 
+          <v-col cols="2">
+            <v-row class="pa-6"> </v-row>
+          </v-col>
+
           <v-col cols="2" class="centered">
-            <v-btn color="secondary" class="searchButton" @click="onSubmit">
+            <v-btn color="secondary" class="searchButton" @click="SearchUsers">
               검색
             </v-btn>
           </v-col>
@@ -47,7 +59,7 @@
             <v-row>
               <v-col cols="6"> </v-col>
               <v-col cols="6">
-                <v-btn color="green" @click="onSubmit"> 수정 </v-btn>
+                <v-btn color="green" @click="SearchUsers"> 수정 </v-btn>
               </v-col>
             </v-row>
           </v-col>
@@ -58,50 +70,71 @@
 </template>
 
 <script>
-import tableData from './sampleDataTable';
-
 export default {
   name: 'UserView',
   data() {
     return {
-      caloriesList: [
+      userTypeList: [
         { text: 'All', value: null },
-        { text: 'Only 237', value: 237 },
-        { text: 'Only 305', value: 305 },
+        { text: '관리자', value: 'Y' },
       ],
+      filters: {
+        email: '',
+        name: '',
+        is_admin: null,
+      },
 
-      dessertFilterValue: '',
-      caloriesFilterValue: null,
-
-      desserts: tableData.data,
+      usersData: [],
     };
   },
   computed: {
     headers() {
       return [
         {
-          text: 'Dessert (100g serving)',
-          align: 'left',
-          sortable: false,
-          value: 'name'
+          text: '이메일',
+          value: 'email',
         },
         {
-          text: 'Calories',
-          value: 'calories'
+          text: '이름',
+          value: 'name',
         },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
-        { text: 'Iron (%)', value: 'iron' },
+        {
+          text: '닉네임',
+          value: 'nickname',
+        },
+        {
+          text: '전화번호',
+          value: 'phone_number',
+        },
+        {
+          text: '생년월일',
+          value: 'birthday',
+        },
+        {
+          text: '가입일',
+          value: 'created_at',
+        },
+        {
+          text: '관리자 여부',
+          value: 'is_admin',
+        },
       ];
     },
   },
   methods: {
-    SearchUsers() {
-      alert(this.dessertFilterValue);
-      alert(this.caloriesFilterValue);
+    async SearchUsers() {
+      const filters = this.filters;
+      const pageNumber = 1;
+
+      const response = await this.$axios.get(`${this.hostname}/users`, {
+        params: {
+          filters,
+          pageNumber,
+        },
+      });
+      this.usersData = response.data.data.users;
+      this.$forceUpdate();
     },
-    
   },
 };
 </script>

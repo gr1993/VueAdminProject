@@ -11,7 +11,10 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css';
 Vue.config.productionTip = false;
 
 Vue.prototype.$axios = axios;
-localStorage.hostname = 'https://admin.localhost/admin';
+
+const hostname = 'https://admin.localhost/admin';
+Vue.prototype.hostname = hostname;
+localStorage.hostname = hostname;
 
 new Vue({
   vuetify,
