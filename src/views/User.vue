@@ -89,12 +89,18 @@
         @input="nextPage"
       ></v-pagination>
     </div>
+    <UserModifyModel ref="user_modify" @searchUsers="searchUsers" />
   </v-container>
 </template>
 
 <script>
+import UserModifyModel from '../components/UserModifyModal.vue';
+
 export default {
   name: 'UserView',
+  components: {
+    UserModifyModel,
+  },
   data() {
     return {
       selected: [],
@@ -158,23 +164,27 @@ export default {
   },
   methods: {
     async searchUsers() {
-      const filters = this.filters;
-      const pageNumber = this.pagination.page;
+      try {
+        const filters = this.filters;
+        const pageNumber = this.pagination.page;
 
-      const response = await this.$axios.get(`${this.hostname}/users`, {
-        params: {
-          filters,
-          pageNumber,
-        },
-      });
-      const { isSuccess, totalCount, data, message } = response.data;
+        const response = await this.$axios.get(`${this.hostname}/users`, {
+          params: {
+            filters,
+            pageNumber,
+          },
+        });
+        const { isSuccess, totalCount, data, message } = response.data;
 
-      if (!isSuccess) {
-        alert(message);
+        if (!isSuccess) {
+          alert(message);
+        }
+
+        this.usersData = data.users;
+        return totalCount;
+      } catch {
+        alert('사용자 검색에 실패하였습니다.');
       }
-
-      this.usersData = data.users;
-      return totalCount;
     },
 
     async searchButtonClick() {
@@ -185,8 +195,14 @@ export default {
     },
 
     async modifyButtonClick() {
-      const selectedUser = this.selected[0];
-      console.log(selectedUser);
+      if (this.selected[0]) {
+        const selectedUser = this.selected[0];
+
+        this.$refs.user_modify.email = selectedUser.email;
+        this.$refs.user_modify.dialog = true;
+      } else {
+        alert('사용자를 선택하세요');
+      }
     },
 
     nextPage() {
