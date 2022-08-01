@@ -80,6 +80,7 @@ export default {
       items: [
         { title: '사용자', icon: 'mdi-account-search-outline', to: '/admin/user' },
 		{ title: '홀인원 상금지급', icon: 'mdi-trophy-outline', to: '/admin/holeinone/reward' },
+		{ title: '뉴스', icon: 'mdi-newspaper', to: '/admin/news' },
       ],
       right: null,
     }
