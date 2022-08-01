@@ -1,91 +1,87 @@
 <template>
   <v-container>
-    <v-row>
-      <v-data-table
-        v-model="selected"
-        :headers="headers"
-        :items="usersData"
-        :single-select="true"
-        item-key="id"
-        class="elevation-1 pa-6"
-        :footer-props="{
-          'items-per-page-options': [10],
-          'disable-items-per-page': true,
-        }"
-        :hide-default-header="false"
-        :hide-default-footer="true"
-        :disable-pagination="true"
-        show-select
-      >
-        <template v-slot:top>
-          <v-container fluid>
-            <v-row class="searchRow">
-              <v-col cols="3">
-                <v-row class="pa-6">
-                  <v-text-field
-                    v-model="filters.email"
-                    type="text"
-                    label="이메일"
-                  ></v-text-field>
-                </v-row>
-              </v-col>
+    <v-data-table
+      v-model="selected"
+      :headers="headers"
+      :items="usersData"
+      :single-select="true"
+      item-key="id"
+      class="elevation-1 pa-6"
+      :footer-props="{
+        'items-per-page-options': [10],
+        'disable-items-per-page': true,
+      }"
+      :hide-default-header="false"
+      :hide-default-footer="true"
+      :disable-pagination="true"
+      show-select
+    >
+      <template v-slot:top>
+        <v-container fluid>
+          <v-row class="searchRow">
+            <v-col cols="3">
+              <v-row class="pa-6">
+                <v-text-field
+                  v-model="filters.email"
+                  type="text"
+                  label="이메일"
+                ></v-text-field>
+              </v-row>
+            </v-col>
 
-              <v-col cols="2">
-                <v-row class="pa-6">
-                  <v-text-field
-                    v-model="filters.name"
-                    type="text"
-                    label="이름"
-                  ></v-text-field>
-                </v-row>
-              </v-col>
+            <v-col cols="2">
+              <v-row class="pa-6">
+                <v-text-field
+                  v-model="filters.name"
+                  type="text"
+                  label="이름"
+                ></v-text-field>
+              </v-row>
+            </v-col>
 
-              <v-col cols="3">
-                <v-row class="pa-6">
-                  <!-- Filter for calories -->
-                  <v-select
-                    :items="userTypeList"
-                    v-model="filters.is_admin"
-                    label="관리자 여부"
-                  ></v-select>
-                </v-row>
-              </v-col>
+            <v-col cols="3">
+              <v-row class="pa-6">
+                <v-select
+                  :items="userTypeList"
+                  v-model="filters.is_admin"
+                  label="관리자 여부"
+                ></v-select>
+              </v-row>
+            </v-col>
 
-              <v-col cols="2">
-                <v-row class="pa-6"> </v-row>
-              </v-col>
+            <v-col cols="2">
+              <v-row class="pa-6"> </v-row>
+            </v-col>
 
-              <v-col cols="2" class="centeredSearchButton">
-                <v-btn
-                  color="secondary"
-                  class="searchButton"
-                  @click="searchButtonClick"
-                >
-                  검색
-                </v-btn>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="10"> </v-col>
-              <v-col cols="2">
-                <v-row>
-                  <v-col cols="6"> </v-col>
-                  <v-col cols="6">
-                    <v-btn color="green" @click="modifyButtonClick">
-                      수정
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-          </v-container>
-        </template>
-      </v-data-table>
-    </v-row>
+            <v-col cols="2" class="centeredSearchButton">
+              <v-btn
+                color="secondary"
+                class="searchButton"
+                @click="searchButtonClick"
+              >
+                검색
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="10"> </v-col>
+            <v-col cols="2">
+              <v-row>
+                <v-col cols="6"> </v-col>
+                <v-col cols="6">
+                  <v-btn color="green" @click="modifyButtonClick"> 수정 </v-btn>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-container>
+      </template>
+    </v-data-table>
     <div class="centeredPagenation">
       <v-pagination
         v-model="pagination.page"
         :length="pagination.pages"
+        :total-visible="10"
         @input="nextPage"
       ></v-pagination>
     </div>
