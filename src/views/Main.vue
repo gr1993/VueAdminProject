@@ -10,6 +10,9 @@
 			<v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
 			<v-spacer />
+
+			<h5 style="margin-right:10px; color:#88f5f7;">gr1993@naver.com</h5>
+			<v-btn color="secondary">로그아웃</v-btn>
     </v-app-bar>
 		
 		<v-navigation-drawer v-model="drawer" app>
