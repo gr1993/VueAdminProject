@@ -2,8 +2,10 @@
   <v-container>
     <v-row>
       <v-data-table
+        v-model="selected"
         :headers="headers"
         :items="usersData"
+        :single-select="true"
         item-key="id"
         class="elevation-1 pa-6"
         :footer-props="{
@@ -13,6 +15,7 @@
         :hide-default-header="false"
         :hide-default-footer="true"
         :disable-pagination="true"
+        show-select
       >
         <template v-slot:top>
           <v-container fluid>
@@ -68,7 +71,9 @@
                 <v-row>
                   <v-col cols="6"> </v-col>
                   <v-col cols="6">
-                    <v-btn color="green" @click="searchUsers"> 수정 </v-btn>
+                    <v-btn color="green" @click="modifyButtonClick">
+                      수정
+                    </v-btn>
                   </v-col>
                 </v-row>
               </v-col>
@@ -92,6 +97,7 @@ export default {
   name: 'UserView',
   data() {
     return {
+      selected: [],
       userTypeList: [
         { text: 'All', value: null },
         { text: '관리자', value: 'Y' },
@@ -176,6 +182,11 @@ export default {
 
       this.pagination.page = 1;
       this.pagination.pages = Math.floor((totalCount - 1) / 10) + 1;
+    },
+
+    async modifyButtonClick() {
+      const selectedUser = this.selected[0];
+      console.log(selectedUser);
     },
 
     nextPage() {
