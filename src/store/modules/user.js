@@ -15,7 +15,11 @@ const userStore = {
     email: null,
     accessToken: null,
   },
-  getters: {},
+  getters: {
+    GET_EMAIL: (state) => {
+      return state.email;
+    },
+  },
   mutations: {
     LOGIN: function (state, { accessToken, email }) {
       state.email = email;
@@ -48,6 +52,7 @@ const userStore = {
     },
     LOGOUT({ commit }) {
       commit('LOGOUT');
+      localStorage.removeItem('accessToken');
     },
   },
 };
