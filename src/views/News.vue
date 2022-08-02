@@ -1,185 +1,223 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="desserts"
-    item-key="name"
-    class="elevation-1 pa-6"
-    :footer-props="{
-      'items-per-page-options':[10],
-      'disable-items-per-page': true,
-    }"
-  >
-    <template v-slot:[`item.certificate_image_path`]="{ item }">
-      <div class="p-2">
-        <a :href="item.certificate_image_path" target="_blank">
-          <v-img 
-            :src="item.certificate_image_path"
-            width="150px"
-            height="150px"
-          >
-          </v-img>
-        </a>
-      </div>
-    </template>
-    <template v-slot:[`item.certifying_shot_image_path`]="{ item }">
-      <div class="p-2">
-        <a :href="item.certifying_shot_image_path" target="_blank">
-          <v-img 
-            :src="item.certifying_shot_image_path"
-            width="150px"
-            height="150px"
-          >
-          </v-img>
-        </a>
-      </div>
-    </template>
+  <v-container>
+    <v-data-table
+      v-model="selected"
+      :headers="headers"
+      :items="newsData"
+      :single-select="true"
+      item-key="id"
+      class="elevation-1 pa-6"
+      :footer-props="{
+        'items-per-page-options': [10],
+        'disable-items-per-page': true,
+      }"
+      :hide-default-header="false"
+      :hide-default-footer="true"
+      :disable-pagination="true"
+      show-select
+    >
+      <template v-slot:[`item.image_path`]="{ item }">
+        <div class="p-2">
+          <a :href="item.image_path" target="_blank">
+            <v-img :src="item.image_path" width="150px" height="150px"> </v-img>
+          </a>
+        </div>
+      </template>
 
-    <template v-slot:top>
-      <!-- v-container, v-col and v-row are just for decoration purposes. -->
-      <v-container fluid>
-        <v-row class="searchRow">
-          <v-col cols="3">
-            <v-row class="pa-6">
-              <!-- Filter for dessert name-->
-              <v-text-field
-                v-model="filters.dessertFilterValue"
-                type="text"
-                label="Name"
-              ></v-text-field>
-            </v-row>
-          </v-col>
+      <template v-slot:[`item.created_at`]="{ item }">
+        {{ formatDate(item.created_at) }}
+      </template>
 
-          <v-col cols="3">
-            <v-row class="pa-6">
-              <!-- Filter for calories -->
-              <v-select
-                :items="caloriesList"
-                v-model="filters.caloriesFilterValue"
-                label="Calories"
-              ></v-select>
-            </v-row>
-          </v-col>
-
-          <v-col cols="4">
-            <v-menu
-              ref="menu"
-              v-model="menu"
-              :close-on-content-click="false"
-              :return-value.sync="date"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
+      <template v-slot:top>
+        <v-container fluid>
+          <v-row class="searchRow">
+            <v-col cols="4">
+              <v-row class="pa-6">
                 <v-text-field
-                  v-model="dateRangeText"
-                  label="Picker in menu"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
+                  v-model="filters.title"
+                  type="text"
+                  label="제목"
                 ></v-text-field>
-              </template>
-              <v-date-picker
-                v-model="dates"
-                no-title
-                scrollable
-                range
-              >
-                <v-spacer></v-spacer>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="menu = false"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="$refs.menu.save(date)"
-                >
-                  OK
-                </v-btn>
-              </v-date-picker>
-            </v-menu>
-          </v-col>
+              </v-row>
+            </v-col>
 
-          <v-col cols="2" class="centered">
-            <v-btn color="secondary" class="searchButton" @click="SearchHoleInOne">
-              검색
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-    </template>
-  </v-data-table>
+            <v-col cols="3">
+              <v-row class="pa-6">
+                <v-text-field
+                  v-model="filters.sub_title"
+                  type="text"
+                  label="부제목"
+                ></v-text-field>
+              </v-row>
+            </v-col>
+
+            <v-col cols="3">
+              <v-row class="pa-6">
+                <v-text-field
+                  v-model="filters.writter"
+                  type="text"
+                  label="출처"
+                ></v-text-field>
+              </v-row>
+            </v-col>
+
+            <v-col cols="2" class="centered">
+              <v-btn
+                color="secondary"
+                class="searchButton"
+                @click="searchButtonClick"
+              >
+                검색
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="9"> </v-col>
+            <v-col cols="3">
+              <v-row>
+                <v-col cols="4">
+                  <v-btn color="blue" @click="modifyButtonClick"> 등록 </v-btn>
+                </v-col>
+                <v-col cols="4">
+                  <v-btn color="green" @click="writeButtonClick"> 수정 </v-btn>
+                </v-col>
+                <v-col cols="4">
+                  <v-btn color="red" @click="modifyButtonClick"> 삭제 </v-btn>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-container>
+      </template>
+    </v-data-table>
+    <div class="centeredPagenation">
+      <v-pagination
+        v-model="pagination.page"
+        :length="pagination.pages"
+        :total-visible="10"
+        @input="nextPage"
+      ></v-pagination>
+    </div>
+    <NewsWriteModel ref="news_modify" />
+  </v-container>
 </template>
 
 <script>
-import tableData from './sampleDataTable2';
+import moment from 'moment';
+import NewsWriteModel from '../components/NewsWriteModal.vue';
 
 export default {
-  name: 'HoleInOneReward',
+  name: 'NewsView',
+  components: {
+    NewsWriteModel,
+  },
   data() {
     return {
+      selected: [],
       menu: false,
-      dates: ['2019-09-10', '2019-09-20'],
-      caloriesList: [
-        { text: 'All', value: null },
-        { text: 'Only 237', value: 237 },
-        { text: 'Only 305', value: 305 },
-      ],
+
       filters: {
-        dessertFilterValue: '',
-        caloriesFilterValue: null,
-        
+        title: '',
+        sub_title: '',
+        writter: null,
       },
-      desserts: tableData.data,
+      pagination: {
+        page: 1,
+        pages: 1,
+      },
+
+      newsData: [],
     };
   },
   computed: {
     headers() {
       return [
         {
-          text: '이름',
-          width: 80,
-          align: 'left',
-          value: 'name'
-        },
-        { 
-          text: '전화번호', 
-          width: 130, 
-          value: 'phone_number',
+          text: '제목',
+          width: 300,
           align: 'center',
+          value: 'title',
         },
-        { text: '구분', width: 80, value: 'type' },
-        { text: '홀인원 멤버쉽번호', width: 140, value: 'hole_in_one_membership_id' },
-        { text: '생성일', width: 120, value: 'created_at' },
-        { text: '등록일', width: 120, value: 'register_date' },
-        { text: '타석일', width: 120, value: 'tee_off_date' },
-        { 
-          text: '증명서 이미지', 
-          width: 150, 
-          value: 'certificate_image_path',
+        {
+          text: '부제목',
+          width: 180,
           align: 'center',
+          value: 'sub_title',
         },
-        { 
-          text: '증명샷 이미지', 
-          width: 150, 
-          value: 'certifying_shot_image_path',
-          align: 'center'
+        {
+          text: '출처',
+          width: 100,
+          align: 'center',
+          value: 'writter',
+        },
+        {
+          text: '생성일',
+          width: 120,
+          align: 'center',
+          value: 'created_at',
+        },
+        {
+          text: '이미지',
+          width: 200,
+          align: 'center',
+          value: 'image_path',
         },
       ];
     },
-    dateRangeText () {
-      return this.dates.join(' ~ ')
-    },
   },
   methods: {
-    SearchHoleInOne() {
-      alert(this.dessertFilterValue);
-      alert(this.caloriesFilterValue);
+    async SearchNews() {
+      try {
+        const filters = this.filters;
+        const pageNumber = this.pagination.page;
+
+        const response = await this.$axios.get(`${this.hostname}/news`, {
+          params: {
+            filters,
+            pageNumber,
+          },
+        });
+        const { isSuccess, totalCount, data, message } = response.data;
+
+        if (!isSuccess) {
+          alert(message);
+        }
+
+        this.newsData = data.news;
+        return totalCount;
+      } catch (error) {
+        alert(error.message);
+        console.log(error);
+        alert('기사 검색에 실패하였습니다.');
+      }
+    },
+
+    async searchButtonClick() {
+      const totalCount = await this.SearchNews();
+
+      this.pagination.page = 1;
+      this.pagination.pages = Math.floor((totalCount - 1) / 10) + 1;
+    },
+
+    writeButtonClick() {
+      if (this.selected[0]) {
+        //const selectedNews = this.selected[0];
+
+        //this.$refs.user_modify.email = selectedNews.email;
+        this.$refs.news_modify.dialog = true;
+      } else {
+        alert('뉴스기사를 선택하세요');
+      }
+    },
+
+    nextPage() {
+      this.SearchNews();
+    },
+
+    formatDate(value) {
+      const formatDate = moment(value).format('YYYY-MM-DD hh:mm:ss');
+      if (!formatDate || formatDate === 'Invalid date') return '';
+      return formatDate;
     },
   },
 };
@@ -187,7 +225,7 @@ export default {
 
 <style>
 .v-data-table > .v-data-table__wrapper > table {
-    border-spacing: 0 0.5rem;
+  border-spacing: 0 0.5rem;
 }
 .centered {
   text-align: center;
