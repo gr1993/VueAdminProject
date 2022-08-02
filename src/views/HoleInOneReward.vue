@@ -5,14 +5,14 @@
     item-key="name"
     class="elevation-1 pa-6"
     :footer-props="{
-      'items-per-page-options':[10],
+      'items-per-page-options': [10],
       'disable-items-per-page': true,
     }"
   >
     <template v-slot:[`item.certificate_image_path`]="{ item }">
       <div class="p-2">
         <a :href="item.certificate_image_path" target="_blank">
-          <v-img 
+          <v-img
             :src="item.certificate_image_path"
             width="150px"
             height="150px"
@@ -24,7 +24,7 @@
     <template v-slot:[`item.certifying_shot_image_path`]="{ item }">
       <div class="p-2">
         <a :href="item.certifying_shot_image_path" target="_blank">
-          <v-img 
+          <v-img
             :src="item.certifying_shot_image_path"
             width="150px"
             height="150px"
@@ -80,25 +80,12 @@
                   v-on="on"
                 ></v-text-field>
               </template>
-              <v-date-picker
-                v-model="dates"
-                no-title
-                scrollable
-                range
-              >
+              <v-date-picker v-model="dates" no-title scrollable range>
                 <v-spacer></v-spacer>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="menu = false"
-                >
+                <v-btn text color="primary" @click="menu = false">
                   Cancel
                 </v-btn>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="$refs.menu.save(date)"
-                >
+                <v-btn text color="primary" @click="$refs.menu.save(date)">
                   OK
                 </v-btn>
               </v-date-picker>
@@ -106,7 +93,11 @@
           </v-col>
 
           <v-col cols="2" class="centered">
-            <v-btn color="secondary" class="searchButton" @click="SearchHoleInOne">
+            <v-btn
+              color="secondary"
+              class="searchButton"
+              @click="SearchHoleInOne"
+            >
               검색
             </v-btn>
           </v-col>
@@ -133,7 +124,6 @@ export default {
       filters: {
         dessertFilterValue: '',
         caloriesFilterValue: null,
-        
       },
       desserts: tableData.data,
     };
@@ -145,35 +135,39 @@ export default {
           text: '이름',
           width: 80,
           align: 'left',
-          value: 'name'
+          value: 'name',
         },
-        { 
-          text: '전화번호', 
-          width: 130, 
+        {
+          text: '전화번호',
+          width: 130,
           value: 'phone_number',
           align: 'center',
         },
         { text: '구분', width: 80, value: 'type' },
-        { text: '홀인원 멤버쉽번호', width: 140, value: 'hole_in_one_membership_id' },
-        { text: '생성일', width: 120, value: 'created_at' },
-        { text: '등록일', width: 120, value: 'register_date' },
-        { text: '타석일', width: 120, value: 'tee_off_date' },
-        { 
-          text: '증명서 이미지', 
-          width: 150, 
+        {
+          text: '홀인원 멤버쉽번호',
+          width: 140,
+          value: 'hole_in_one_membership_id',
+        },
+        { text: '상금신청일', width: 120, value: 'created_at' },
+        { text: '멤버쉽 등록일', width: 120, value: 'register_date' },
+        { text: '티오프시간', width: 120, value: 'tee_off_date' },
+        {
+          text: '증명서 이미지',
+          width: 150,
           value: 'certificate_image_path',
           align: 'center',
         },
-        { 
-          text: '증명샷 이미지', 
-          width: 150, 
+        {
+          text: '증명샷 이미지',
+          width: 150,
           value: 'certifying_shot_image_path',
-          align: 'center'
+          align: 'center',
         },
       ];
     },
-    dateRangeText () {
-      return this.dates.join(' ~ ')
+    dateRangeText() {
+      return this.dates.join(' ~ ');
     },
   },
   methods: {
@@ -187,7 +181,7 @@ export default {
 
 <style>
 .v-data-table > .v-data-table__wrapper > table {
-    border-spacing: 0 0.5rem;
+  border-spacing: 0 0.5rem;
 }
 .centered {
   text-align: center;
