@@ -16,6 +16,10 @@
       :disable-pagination="true"
       show-select
     >
+      <template v-slot:[`item.created_at`]="{ item }">
+        {{ formatDate(item.created_at) }}
+      </template>
+
       <template v-slot:top>
         <v-container fluid>
           <v-row class="searchRow">
@@ -90,6 +94,7 @@
 </template>
 
 <script>
+import moment from 'moment';
 import UserModifyModel from '../components/UserModifyModal.vue';
 
 export default {
@@ -203,6 +208,12 @@ export default {
 
     nextPage() {
       this.searchUsers();
+    },
+
+    formatDate(value) {
+      const formatDate = moment(value).format('YYYY-DD-MM hh:mm:ss');
+      if (!formatDate || formatDate === 'Invalid date') return '';
+      return formatDate;
     },
   },
 };
