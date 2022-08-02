@@ -72,19 +72,22 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="9"> </v-col>
-            <v-col cols="3">
-              <v-row>
-                <v-col cols="4">
-                  <v-btn color="blue" @click="modifyButtonClick"> 등록 </v-btn>
-                </v-col>
-                <v-col cols="4">
-                  <v-btn color="green" @click="writeButtonClick"> 수정 </v-btn>
-                </v-col>
-                <v-col cols="4">
-                  <v-btn color="red" @click="modifyButtonClick"> 삭제 </v-btn>
-                </v-col>
-              </v-row>
+            <v-col cols="12" align="right">
+              <v-btn
+                color="blue"
+                style="margin-right: 10px"
+                @click="addButtonClick"
+              >
+                등록
+              </v-btn>
+              <v-btn
+                color="green"
+                style="margin-right: 10px"
+                @click="writeButtonClick"
+              >
+                수정
+              </v-btn>
+              <v-btn color="red" @click="deleteButtonClick"> 삭제 </v-btn>
             </v-col>
           </v-row>
         </v-container>
@@ -199,6 +202,8 @@ export default {
       this.pagination.pages = Math.floor((totalCount - 1) / 10) + 1;
     },
 
+    addButtonClick() {},
+
     writeButtonClick() {
       if (this.selected[0]) {
         const selectedNews = this.selected[0];
@@ -209,6 +214,8 @@ export default {
         alert('뉴스기사를 선택하세요');
       }
     },
+
+    deleteButtonClick() {},
 
     nextPage() {
       this.SearchNews();
