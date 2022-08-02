@@ -3,7 +3,7 @@
     <v-dialog v-model="dialog" persistent max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="text-h5">뉴스기사 수정</span>
+          <span class="text-h5">뉴스기사 추가</span>
         </v-card-title>
         <v-card-text>
           <v-container>
@@ -44,7 +44,6 @@
                   v-model="image"
                   label="이미지"
                   prepend-icon="mdi-camera"
-                  @change="fileInputChange"
                 >
                 </v-file-input>
                 <v-img :src="url"></v-img>
@@ -58,7 +57,7 @@
             닫기
           </v-btn>
           <v-btn color="blue darken-1" text @click="saveButtonClick">
-            수정
+            추가
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -71,7 +70,6 @@ export default {
   data: () => ({
     dialog: false,
 
-    id: null,
     title: '',
     sub_title: '',
     writter: '',
@@ -79,13 +77,11 @@ export default {
 
     url: null,
     image: null,
-    isChangeImage: '',
   }),
   methods: {
     clearModal() {
       this.dialog = false;
 
-      this.id = null;
       this.title = '';
       this.sub_title = '';
       this.writter = '';
@@ -93,46 +89,19 @@ export default {
 
       this.url = null;
       this.image = null;
-      this.isChangeImage = '';
-    },
-
-    async getNewsDetail(id) {
-      try {
-        this.id = id;
-
-        const response = await this.$axios.get(
-          `${this.hostname}/news/detail?id=${id}`
-        );
-        const { isSuccess, message, data } = response.data;
-        if (!isSuccess) {
-          alert(message);
-          return;
-        }
-
-        const { news } = data;
-
-        this.title = news.title;
-        this.sub_title = news.sub_title;
-        this.writter = news.writter;
-        this.content = news.content;
-      } catch {
-        alert('뉴스기사 정보 불러오기 실패');
-      }
     },
 
     async saveButtonClick() {
       try {
         const formData = new FormData();
-        formData.append('id', this.id);
         formData.append('title', this.title);
         formData.append('sub_title', this.sub_title);
         formData.append('writter', this.writter);
         formData.append('content', this.content);
-        formData.append('isChangeImage', this.isChangeImage);
         formData.append('image', this.image);
 
         const response = await this.$axios.post(
-          `${this.hostname}/news/modify`,
+          `${this.hostname}/news/add`,
           formData,
           {
             headers: {
@@ -147,12 +116,8 @@ export default {
         this.clearModal();
         this.$emit('SearchNews');
       } catch {
-        alert('뉴스기사 수정에 실패하였습니다.');
+        alert('뉴스기사 추가에 실패하였습니다.');
       }
-    },
-
-    fileInputChange() {
-      this.isChangeImage = 'Y';
     },
 
     closeButtonClick() {

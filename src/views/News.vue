@@ -101,18 +101,21 @@
         @input="nextPage"
       ></v-pagination>
     </div>
-    <NewsWriteModel ref="news_modify" @SearchNews="SearchNews" />
+    <NewAddModal ref="news_add" @SearchNews="SearchNews" />
+    <NewsWriteModal ref="news_modify" @SearchNews="SearchNews" />
   </v-container>
 </template>
 
 <script>
 import moment from 'moment';
-import NewsWriteModel from '../components/NewsWriteModal.vue';
+import NewAddModal from '../components/NewsAddModal.vue';
+import NewsWriteModal from '../components/NewsWriteModal.vue';
 
 export default {
   name: 'NewsView',
   components: {
-    NewsWriteModel,
+    NewAddModal,
+    NewsWriteModal,
   },
   data() {
     return {
@@ -202,7 +205,9 @@ export default {
       this.pagination.pages = Math.floor((totalCount - 1) / 10) + 1;
     },
 
-    addButtonClick() {},
+    addButtonClick() {
+      this.$refs.news_add.dialog = true;
+    },
 
     writeButtonClick() {
       if (this.selected[0]) {
