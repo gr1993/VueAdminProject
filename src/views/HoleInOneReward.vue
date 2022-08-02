@@ -35,12 +35,10 @@
     </template>
 
     <template v-slot:top>
-      <!-- v-container, v-col and v-row are just for decoration purposes. -->
       <v-container fluid>
         <v-row class="searchRow">
           <v-col cols="3">
             <v-row class="pa-6">
-              <!-- Filter for dessert name-->
               <v-text-field
                 v-model="filters.dessertFilterValue"
                 type="text"
@@ -51,7 +49,6 @@
 
           <v-col cols="3">
             <v-row class="pa-6">
-              <!-- Filter for calories -->
               <v-select
                 :items="caloriesList"
                 v-model="filters.caloriesFilterValue"
