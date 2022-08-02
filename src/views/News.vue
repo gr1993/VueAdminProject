@@ -215,7 +215,29 @@ export default {
       }
     },
 
-    deleteButtonClick() {},
+    async deleteButtonClick() {
+      if (this.selected[0]) {
+        try {
+          const result = window.confirm('해당 기사를 삭제하시겠습니까?');
+          if (result) {
+            const deletedId = this.selected[0].id;
+
+            const response = await this.$axios.post(
+              `${this.hostname}/news/delete/${deletedId}`
+            );
+
+            const { message } = response.data;
+            alert(message);
+
+            this.SearchNews();
+          }
+        } catch {
+          alert('뉴스기사 삭제에 실패하였습니다.');
+        }
+      } else {
+        alert('뉴스기사를 선택하세요');
+      }
+    },
 
     nextPage() {
       this.SearchNews();
