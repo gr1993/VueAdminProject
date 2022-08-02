@@ -10,8 +10,8 @@
             <v-row no-gutters>
               <v-col cols="12">
                 <v-textarea
+                  v-model="title"
                   label="제목"
-                  :value="email"
                   :rows="2"
                   :no-resize="true"
                   outlined
@@ -20,8 +20,8 @@
               </v-col>
               <v-col cols="12">
                 <v-textarea
+                  v-model="sub_title"
                   label="부제목"
-                  :value="email"
                   :rows="2"
                   :no-resize="true"
                   outlined
@@ -30,13 +30,13 @@
               </v-col>
               <v-col cols="12">
                 <v-text-field
+                  v-model="writter"
                   label="출처"
-                  :value="email"
                   outlined
                 ></v-text-field>
               </v-col>
               <v-col cols="12">
-                <v-textarea label="기사" :value="email" :rows="5" outlined>
+                <v-textarea v-model="content" label="기사" :rows="10" outlined>
                 </v-textarea>
               </v-col>
               <v-col cols="12">
@@ -44,6 +44,7 @@
                   v-model="image"
                   label="이미지"
                   prepend-icon="mdi-camera"
+                  @change="fileInputChange"
                 >
                 </v-file-input>
                 <v-img :src="url"></v-img>
@@ -69,28 +70,75 @@
 export default {
   props: ['email'],
   data: () => ({
-    password: '',
-    is_admin: null,
-    dialog: true,
+    dialog: false,
+
+    id: null,
+    title: '',
+    sub_title: '',
+    writter: '',
+    content: '',
 
     url: null,
     image: null,
+    isChangeImage: '',
   }),
   methods: {
     clearModal() {
-      this.password = '';
-      this.is_admin = null;
       this.dialog = false;
+
+      this.id = null;
+      this.title = '';
+      this.sub_title = '';
+      this.writter = '';
+      this.content = '';
+
+      this.url = null;
+      this.image = null;
+      this.isChangeImage = '';
+    },
+
+    async getNewsDetail(id) {
+      try {
+        this.id = id;
+
+        const response = await this.$axios.get(
+          `${this.hostname}/news/detail?id=${id}`
+        );
+        const { isSuccess, message, data } = response.data;
+        if (!isSuccess) {
+          alert(message);
+          return;
+        }
+
+        const { news } = data;
+
+        this.title = news.title;
+        this.sub_title = news.sub_title;
+        this.writter = news.writter;
+        this.content = news.content;
+      } catch {
+        alert('뉴스기사 정보 불러오기 실패');
+      }
     },
 
     async saveButtonClick() {
       try {
+        const formData = new FormData();
+        formData.append('id', this.id);
+        formData.append('title', this.title);
+        formData.append('sub_title', this.sub_title);
+        formData.append('writter', this.writter);
+        formData.append('content', this.content);
+        formData.append('isChangeImage', this.isChangeImage);
+        formData.append('image', this.image);
+
         const response = await this.$axios.post(
-          `${this.hostname}/users/modify`,
+          `${this.hostname}/news/modify`,
+          formData,
           {
-            email: this.email,
-            password: this.password,
-            is_admin: this.is_admin,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           }
         );
         const { isSuccess, message } = response.data;
@@ -98,10 +146,14 @@ export default {
         if (!isSuccess) return;
 
         this.clearModal();
-        this.$emit('searchUsers');
+        this.$emit('SearchNews');
       } catch {
-        alert('사용자 수정에 실패하였습니다.');
+        alert('뉴스기사 수정에 실패하였습니다.');
       }
+    },
+
+    fileInputChange() {
+      this.isChangeImage = 'Y';
     },
 
     closeButtonClick() {

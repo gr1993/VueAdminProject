@@ -98,7 +98,7 @@
         @input="nextPage"
       ></v-pagination>
     </div>
-    <NewsWriteModel ref="news_modify" />
+    <NewsWriteModel ref="news_modify" @SearchNews="SearchNews" />
   </v-container>
 </template>
 
@@ -201,10 +201,10 @@ export default {
 
     writeButtonClick() {
       if (this.selected[0]) {
-        //const selectedNews = this.selected[0];
+        const selectedNews = this.selected[0];
 
-        //this.$refs.user_modify.email = selectedNews.email;
         this.$refs.news_modify.dialog = true;
+        this.$refs.news_modify.getNewsDetail(selectedNews.id);
       } else {
         alert('뉴스기사를 선택하세요');
       }
