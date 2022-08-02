@@ -1,34 +1,52 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="dialog" persistent max-width="400px">
+    <v-dialog v-model="dialog" persistent max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="text-h5">사용자 수정</span>
+          <span class="text-h5">뉴스기사 수정</span>
         </v-card-title>
         <v-card-text>
           <v-container>
-            <v-row>
+            <v-row no-gutters>
               <v-col cols="12">
-                <v-text-field
-                  label="이메일"
+                <v-textarea
+                  label="제목"
                   :value="email"
-                  readonly
-                ></v-text-field>
+                  :rows="2"
+                  :no-resize="true"
+                  outlined
+                >
+                </v-textarea>
+              </v-col>
+              <v-col cols="12">
+                <v-textarea
+                  label="부제목"
+                  :value="email"
+                  :rows="2"
+                  :no-resize="true"
+                  outlined
+                >
+                </v-textarea>
               </v-col>
               <v-col cols="12">
                 <v-text-field
-                  v-model="password"
-                  label="패스워드"
-                  type="password"
+                  label="출처"
+                  :value="email"
+                  outlined
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="6">
-                <v-select
-                  v-model="is_admin"
-                  :items="['Y', 'N']"
-                  label="관리자 여부"
-                  required
-                ></v-select>
+              <v-col cols="12">
+                <v-textarea label="기사" :value="email" :rows="5" outlined>
+                </v-textarea>
+              </v-col>
+              <v-col cols="12">
+                <v-file-input
+                  v-model="image"
+                  label="이미지"
+                  prepend-icon="mdi-camera"
+                >
+                </v-file-input>
+                <v-img :src="url"></v-img>
               </v-col>
             </v-row>
           </v-container>
@@ -53,7 +71,10 @@ export default {
   data: () => ({
     password: '',
     is_admin: null,
-    dialog: false,
+    dialog: true,
+
+    url: null,
+    image: null,
   }),
   methods: {
     clearModal() {
