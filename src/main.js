@@ -12,7 +12,9 @@ Vue.config.productionTip = false;
 
 Vue.prototype.$axios = axios;
 
-const hostname = 'https://admin.localhost/admin';
+//const hostname = 'https://admin.localhost/admin';
+const hostname = 'https://admin.longestgolf.com/admin';
+
 Vue.prototype.hostname = hostname;
 localStorage.hostname = hostname;
 
