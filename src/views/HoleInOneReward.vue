@@ -2,8 +2,8 @@
   <v-container fluid>
     <v-data-table
       :headers="headers"
-      :items="desserts"
-      item-key="name"
+      :items="rewardData"
+      item-key="id"
       class="elevation-1 pa-6"
       :footer-props="{
         'items-per-page-options': [10],
@@ -13,6 +13,18 @@
       :hide-default-footer="true"
       :disable-pagination="true"
     >
+      <template v-slot:[`item.register_date`]="{ item }">
+        {{ formatDate(item.register_date) }}
+      </template>
+
+      <template v-slot:[`item.created_at`]="{ item }">
+        {{ formatDate(item.created_at) }}
+      </template>
+
+      <template v-slot:[`item.tee_off_date`]="{ item }">
+        {{ formatDate(item.tee_off_date) }}
+      </template>
+
       <template v-slot:[`item.base_document`]="{ item }">
         <div class="p-2">
           <v-btn color="primary" :value="item.base_document"> 보기 </v-btn>
@@ -35,7 +47,6 @@
                   ref="menu"
                   v-model="menu"
                   :close-on-content-click="false"
-                  :return-value.sync="date"
                   transition="scale-transition"
                   offset-y
                   min-width="auto"
@@ -48,7 +59,7 @@
                       readonly
                       v-bind="attrs"
                       v-on="on"
-                      :hide-details="auto"
+                      hide-details="auto"
                     ></v-text-field>
                   </template>
                   <v-date-picker
@@ -71,7 +82,7 @@
                 <v-combobox
                   v-model="filterTargetSelect"
                   :items="filterTargets"
-                  :hide-details="auto"
+                  hide-details="auto"
                   style="width: 100px; float: left; padding-left: 30px"
                   label="검색대상"
                   outlined
@@ -88,7 +99,7 @@
                   style="width: 400px; float: left"
                 >
                 </v-text-field>
-                <v-btn icon class="hidden-xs-only" @click="SearchHoleInOne">
+                <v-btn icon class="hidden-xs-only" @click="searchButtonClick">
                   <v-icon>mdi-magnify</v-icon>
                 </v-btn>
               </v-toolbar>
@@ -132,12 +143,13 @@
 
 <script>
 import moment from 'moment';
-import tableData from './sampleDataTable2';
 
 export default {
   name: 'HoleInOneReward',
   data() {
     return {
+      menu: false,
+
       filterTargetSelect: { text: '전체', value: '' },
       filterTargets: [
         {
@@ -153,14 +165,6 @@ export default {
           value: 'name',
         },
       ],
-      people: [
-        { name: 'Sandra Adams', group: 'Group 1' },
-        { name: 'Ali Connors', group: 'Group 1' },
-        { name: 'Trevor Hansen', group: 'Group 1' },
-        { name: 'Tucker Smith', group: 'Group 1' },
-      ],
-      menu: false,
-
       filters: {
         dates: ['2022-01-01', '2022-01-01'],
         searchValue: '',
@@ -170,7 +174,7 @@ export default {
         pages: 1,
       },
 
-      desserts: tableData.data,
+      rewardData: [],
     };
   },
   created() {
@@ -273,9 +277,48 @@ export default {
     },
   },
   methods: {
-    SearchHoleInOne() {
-      alert(this.filterTargetSelect.value);
-      alert(this.filters.searchValue);
+    async SearchHoleInOne() {
+      try {
+        const filters = {
+          start_date: this.filters.dates[0],
+          end_date: this.filters.dates[1],
+        };
+        if (this.filterTargetSelect.value) {
+          filters[this.filterTargetSelect.value] = this.filters.searchValue;
+        }
+        const pageNumber = this.pagination.page;
+
+        const response = await this.$axios.get(`${this.hostname}/holeinone`, {
+          params: {
+            filters,
+            pageNumber,
+          },
+        });
+        const { isSuccess, totalCount, data, message } = response.data;
+
+        if (!isSuccess) {
+          alert(message);
+          return;
+        }
+
+        this.rewardData = data.holeInOneRewards;
+        return totalCount;
+      } catch (error) {
+        alert(error.message);
+        console.log(error);
+        alert('상금지급 검색에 실패하였습니다.');
+      }
+    },
+
+    async searchButtonClick() {
+      const totalCount = await this.SearchHoleInOne();
+
+      this.pagination.page = 1;
+      this.pagination.pages = Math.floor((totalCount - 1) / 10) + 1;
+    },
+
+    nextPage() {
+      this.SearchHoleInOne();
     },
 
     formatDate(value) {
