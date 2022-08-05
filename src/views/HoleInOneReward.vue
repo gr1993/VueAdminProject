@@ -1,145 +1,180 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="desserts"
-    item-key="name"
-    class="elevation-1 pa-6"
-    :footer-props="{
-      'items-per-page-options': [10],
-      'disable-items-per-page': true,
-    }"
-    :hide-default-header="false"
-    :hide-default-footer="true"
-    :disable-pagination="true"
-  >
-    <template v-slot:[`item.base_document`]="{ item }">
-      <div class="p-2">
-        <v-btn color="primary" :value="item.base_document"> 보기 </v-btn>
-      </div>
-    </template>
+  <v-container fluid>
+    <v-data-table
+      :headers="headers"
+      :items="desserts"
+      item-key="name"
+      class="elevation-1 pa-6"
+      :footer-props="{
+        'items-per-page-options': [10],
+        'disable-items-per-page': true,
+      }"
+      :hide-default-header="false"
+      :hide-default-footer="true"
+      :disable-pagination="true"
+    >
+      <template v-slot:[`item.base_document`]="{ item }">
+        <div class="p-2">
+          <v-btn color="primary" :value="item.base_document"> 보기 </v-btn>
+        </div>
+      </template>
 
-    <template v-slot:[`item.added_document`]="{ item }">
-      <div class="p-2">
-        <v-btn color="primary" :value="item.added_document"> 보기 </v-btn>
-      </div>
-    </template>
+      <template v-slot:[`item.added_document`]="{ item }">
+        <div class="p-2">
+          <v-btn color="primary" :value="item.added_document"> 보기 </v-btn>
+        </div>
+      </template>
 
-    <template v-slot:top>
-      <v-container fluid>
-        <v-row class="searchRow">
-          <v-col cols="12">
-            <v-toolbar dark color="#698af5" :rounded="true">
-              <!-- 날짜 필터 -->
-              <v-menu
-                ref="menu"
-                v-model="menu"
-                :close-on-content-click="false"
-                :return-value.sync="date"
-                transition="scale-transition"
-                offset-y
-                min-width="auto"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="dateRangeText"
-                    label="신청일 기간"
-                    prepend-icon="mdi-calendar"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                    :hide-details="auto"
-                  ></v-text-field>
-                </template>
-                <v-date-picker v-model="dates" no-title scrollable range>
-                  <v-spacer></v-spacer>
-                  <v-btn text color="primary" @click="menu = false">
-                    Cancel
-                  </v-btn>
-                  <v-btn text color="primary" @click="$refs.menu.save(date)">
-                    OK
-                  </v-btn>
-                </v-date-picker>
-              </v-menu>
+      <template v-slot:top>
+        <v-container fluid>
+          <v-row class="searchRow">
+            <v-col cols="12">
+              <v-toolbar dark color="#698af5" :rounded="true">
+                <!-- 날짜 필터 -->
+                <v-menu
+                  ref="menu"
+                  v-model="menu"
+                  :close-on-content-click="false"
+                  :return-value.sync="date"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="dateRangeText"
+                      label="신청일 기간"
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                      :hide-details="auto"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                    v-model="filters.dates"
+                    no-title
+                    scrollable
+                    range
+                  >
+                    <v-spacer></v-spacer>
+                    <v-btn text color="primary" @click="menu = false">
+                      Cancel
+                    </v-btn>
+                    <v-btn text color="primary" @click="$refs.menu.save(date)">
+                      OK
+                    </v-btn>
+                  </v-date-picker>
+                </v-menu>
 
-              <!-- 검색 필터 -->
-              <v-combobox
-                v-model="select"
-                :items="items"
-                :hide-details="auto"
-                style="width: 100px; float: left; padding-left: 30px"
-                label="검색대상"
-                outlined
-                dense
-              ></v-combobox>
-              <v-autocomplete
-                v-model="select"
-                :loading="loading"
-                :items="items"
-                :search-input.sync="search"
-                cache-items
-                class="mx-4"
-                flat
-                hide-no-data
-                hide-details
-                label="검색어"
-                solo-inverted
-                style="width: 400px; float: left"
-              ></v-autocomplete>
-              <v-btn icon class="hidden-xs-only">
-                <v-icon>mdi-magnify</v-icon>
-              </v-btn>
-            </v-toolbar>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12" align="left">
-            <h3 class="badge">
-              <v-badge color="green" content="6"> 전체 </v-badge>
-            </h3>
-            <h3 class="badge">
-              <v-badge color="black" content="6"> 요청 </v-badge>
-            </h3>
-            <h3 class="badge">
-              <v-badge color="black" content="6"> 심사중 </v-badge>
-            </h3>
-            <h3 class="badge">
-              <v-badge color="red" content="6"> 심사완료(거절) </v-badge>
-            </h3>
-            <h3 class="badge">
-              <v-badge color="blue" content="6"> 심사완료(지급) </v-badge>
-            </h3>
-            <h3 class="badge">
-              <v-badge color="blue" content="6"> 지급완료 </v-badge>
-            </h3>
-          </v-col>
-        </v-row>
-      </v-container>
-    </template>
-  </v-data-table>
+                <!-- 검색 필터 -->
+                <v-combobox
+                  v-model="filterTargetSelect"
+                  :items="filterTargets"
+                  :hide-details="auto"
+                  style="width: 100px; float: left; padding-left: 30px"
+                  label="검색대상"
+                  outlined
+                  dense
+                ></v-combobox>
+                <v-text-field
+                  v-model="filters.searchValue"
+                  class="mx-4"
+                  flat
+                  hide-no-data
+                  hide-details
+                  label="검색어"
+                  solo-inverted
+                  style="width: 400px; float: left"
+                >
+                </v-text-field>
+                <v-btn icon class="hidden-xs-only" @click="SearchHoleInOne">
+                  <v-icon>mdi-magnify</v-icon>
+                </v-btn>
+              </v-toolbar>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" align="left">
+              <h3 class="badge">
+                <v-badge color="green" content="6"> 전체 </v-badge>
+              </h3>
+              <h3 class="badge">
+                <v-badge color="black" content="6"> 요청 </v-badge>
+              </h3>
+              <h3 class="badge">
+                <v-badge color="black" content="6"> 심사중 </v-badge>
+              </h3>
+              <h3 class="badge">
+                <v-badge color="red" content="6"> 심사완료(거절) </v-badge>
+              </h3>
+              <h3 class="badge">
+                <v-badge color="blue" content="6"> 심사완료(지급) </v-badge>
+              </h3>
+              <h3 class="badge">
+                <v-badge color="blue" content="6"> 지급완료 </v-badge>
+              </h3>
+            </v-col>
+          </v-row>
+        </v-container>
+      </template>
+    </v-data-table>
+    <div class="centeredPagenation">
+      <v-pagination
+        v-model="pagination.page"
+        :length="pagination.pages"
+        :total-visible="10"
+        @input="nextPage"
+      ></v-pagination>
+    </div>
+  </v-container>
 </template>
 
 <script>
+import moment from 'moment';
 import tableData from './sampleDataTable2';
 
 export default {
   name: 'HoleInOneReward',
   data() {
     return {
-      select: ['Vuetify'],
-      items: ['Programming', 'Design', 'Vue', 'Vuetify'],
-      menu: false,
-      dates: ['2019-09-10', '2019-09-20'],
-      caloriesList: [
-        { text: 'All', value: null },
-        { text: 'Only 237', value: 237 },
-        { text: 'Only 305', value: 305 },
+      filterTargetSelect: { text: '전체', value: '' },
+      filterTargets: [
+        {
+          text: '전체',
+          value: '',
+        },
+        {
+          text: '구분',
+          value: 'type',
+        },
+        {
+          text: '이름',
+          value: 'name',
+        },
       ],
+      people: [
+        { name: 'Sandra Adams', group: 'Group 1' },
+        { name: 'Ali Connors', group: 'Group 1' },
+        { name: 'Trevor Hansen', group: 'Group 1' },
+        { name: 'Tucker Smith', group: 'Group 1' },
+      ],
+      menu: false,
+
       filters: {
-        dessertFilterValue: '',
-        caloriesFilterValue: null,
+        dates: ['2022-01-01', '2022-01-01'],
+        searchValue: '',
       },
+      pagination: {
+        page: 1,
+        pages: 1,
+      },
+
       desserts: tableData.data,
     };
+  },
+  created() {
+    this.filters.dates[1] = moment().format('YYYY-MM-DD');
   },
   computed: {
     headers() {
@@ -234,13 +269,19 @@ export default {
       ];
     },
     dateRangeText() {
-      return this.dates.join(' ~ ');
+      return this.filters.dates.join(' ~ ');
     },
   },
   methods: {
     SearchHoleInOne() {
-      alert(this.dessertFilterValue);
-      alert(this.caloriesFilterValue);
+      alert(this.filterTargetSelect.value);
+      alert(this.filters.searchValue);
+    },
+
+    formatDate(value) {
+      const formatDate = moment(value).format('YYYY-MM-DD hh:mm:ss');
+      if (!formatDate || formatDate === 'Invalid date') return '';
+      return formatDate;
     },
   },
 };
