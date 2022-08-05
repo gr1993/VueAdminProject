@@ -8,95 +8,109 @@
       'items-per-page-options': [10],
       'disable-items-per-page': true,
     }"
+    :hide-default-header="false"
+    :hide-default-footer="true"
+    :disable-pagination="true"
   >
-    <template v-slot:[`item.certificate_image_path`]="{ item }">
+    <template v-slot:[`item.base_document`]="{ item }">
       <div class="p-2">
-        <a :href="item.certificate_image_path" target="_blank">
-          <v-img
-            :src="item.certificate_image_path"
-            width="150px"
-            height="150px"
-          >
-          </v-img>
-        </a>
+        <v-btn color="primary" :value="item.base_document"> 보기 </v-btn>
       </div>
     </template>
-    <template v-slot:[`item.certifying_shot_image_path`]="{ item }">
+
+    <template v-slot:[`item.added_document`]="{ item }">
       <div class="p-2">
-        <a :href="item.certifying_shot_image_path" target="_blank">
-          <v-img
-            :src="item.certifying_shot_image_path"
-            width="150px"
-            height="150px"
-          >
-          </v-img>
-        </a>
+        <v-btn color="primary" :value="item.added_document"> 보기 </v-btn>
       </div>
     </template>
 
     <template v-slot:top>
       <v-container fluid>
         <v-row class="searchRow">
-          <v-col cols="3">
-            <v-row class="pa-6">
-              <v-text-field
-                v-model="filters.dessertFilterValue"
-                type="text"
-                label="Name"
-              ></v-text-field>
-            </v-row>
-          </v-col>
+          <v-col cols="12">
+            <v-toolbar dark color="#698af5" :rounded="true">
+              <!-- 날짜 필터 -->
+              <v-menu
+                ref="menu"
+                v-model="menu"
+                :close-on-content-click="false"
+                :return-value.sync="date"
+                transition="scale-transition"
+                offset-y
+                min-width="auto"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    v-model="dateRangeText"
+                    label="신청일 기간"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                    :hide-details="auto"
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-model="dates" no-title scrollable range>
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="menu = false">
+                    Cancel
+                  </v-btn>
+                  <v-btn text color="primary" @click="$refs.menu.save(date)">
+                    OK
+                  </v-btn>
+                </v-date-picker>
+              </v-menu>
 
-          <v-col cols="3">
-            <v-row class="pa-6">
-              <v-select
-                :items="caloriesList"
-                v-model="filters.caloriesFilterValue"
-                label="Calories"
-              ></v-select>
-            </v-row>
+              <!-- 검색 필터 -->
+              <v-combobox
+                v-model="select"
+                :items="items"
+                :hide-details="auto"
+                style="width: 100px; float: left; padding-left: 30px"
+                label="검색대상"
+                outlined
+                dense
+              ></v-combobox>
+              <v-autocomplete
+                v-model="select"
+                :loading="loading"
+                :items="items"
+                :search-input.sync="search"
+                cache-items
+                class="mx-4"
+                flat
+                hide-no-data
+                hide-details
+                label="검색어"
+                solo-inverted
+                style="width: 400px; float: left"
+              ></v-autocomplete>
+              <v-btn icon class="hidden-xs-only">
+                <v-icon>mdi-magnify</v-icon>
+              </v-btn>
+            </v-toolbar>
           </v-col>
-
-          <v-col cols="4">
-            <v-menu
-              ref="menu"
-              v-model="menu"
-              :close-on-content-click="false"
-              :return-value.sync="date"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model="dateRangeText"
-                  label="Picker in menu"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                ></v-text-field>
-              </template>
-              <v-date-picker v-model="dates" no-title scrollable range>
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="menu = false">
-                  Cancel
-                </v-btn>
-                <v-btn text color="primary" @click="$refs.menu.save(date)">
-                  OK
-                </v-btn>
-              </v-date-picker>
-            </v-menu>
-          </v-col>
-
-          <v-col cols="2" class="centered">
-            <v-btn
-              color="secondary"
-              class="searchButton"
-              @click="SearchHoleInOne"
-            >
-              검색
-            </v-btn>
+        </v-row>
+        <v-row>
+          <v-col cols="12" align="left">
+            <h3 class="badge">
+              <v-badge color="green" content="6"> 전체 </v-badge>
+            </h3>
+            <h3 class="badge">
+              <v-badge color="black" content="6"> 요청 </v-badge>
+            </h3>
+            <h3 class="badge">
+              <v-badge color="black" content="6"> 심사중 </v-badge>
+            </h3>
+            <h3 class="badge">
+              <v-badge color="red" content="6"> 심사완료(거절) </v-badge>
+            </h3>
+            <h3 class="badge">
+              <v-badge color="blue" content="6"> 심사완료(지급) </v-badge>
+            </h3>
+            <h3 class="badge">
+              <v-badge color="blue" content="6"> 지급완료 </v-badge>
+            </h3>
           </v-col>
         </v-row>
       </v-container>
@@ -111,6 +125,8 @@ export default {
   name: 'HoleInOneReward',
   data() {
     return {
+      select: ['Vuetify'],
+      items: ['Programming', 'Design', 'Vue', 'Vuetify'],
       menu: false,
       dates: ['2019-09-10', '2019-09-20'],
       caloriesList: [
@@ -129,37 +145,91 @@ export default {
     headers() {
       return [
         {
+          text: '상태',
+          width: 80,
+          align: 'center',
+          value: 'status',
+        },
+        {
+          text: '구분',
+          width: 80,
+          align: 'center',
+          value: 'type',
+        },
+        {
           text: '이름',
           width: 80,
-          align: 'left',
+          align: 'center',
           value: 'name',
         },
         {
           text: '전화번호',
           width: 130,
-          value: 'phone_number',
           align: 'center',
+          value: 'phone_number',
         },
-        { text: '구분', width: 80, value: 'type' },
         {
           text: '홀인원 멤버쉽번호',
           width: 140,
+          align: 'center',
           value: 'hole_in_one_membership_id',
         },
-        { text: '상금신청일', width: 120, value: 'created_at' },
-        { text: '멤버쉽 등록일', width: 120, value: 'register_date' },
+        { text: '가입일', width: 120, value: 'register_date' },
+        { text: '신청일', width: 120, value: 'created_at' },
         { text: '티오프시간', width: 120, value: 'tee_off_date' },
         {
-          text: '증명서 이미지',
-          width: 150,
-          value: 'certificate_image_path',
+          text: '기본서류',
+          width: 100,
+          value: 'base_document',
           align: 'center',
         },
         {
-          text: '증명샷 이미지',
-          width: 150,
-          value: 'certifying_shot_image_path',
+          text: '구장(코스)',
+          width: 100,
           align: 'center',
+          value: 'phone_number',
+        },
+        {
+          text: '업장',
+          width: 100,
+          align: 'center',
+          value: 'phone_number',
+        },
+        {
+          text: '골프존 ID',
+          width: 100,
+          align: 'center',
+          value: 'phone_number',
+        },
+        {
+          text: '추가서류',
+          width: 100,
+          align: 'center',
+          value: 'added_document',
+        },
+        {
+          text: '심사결과',
+          width: 100,
+          align: 'center',
+          value: 'phone_number',
+        },
+        {
+          text: '심사기한',
+          width: 100,
+          align: 'center',
+          value: 'phone_number',
+        },
+        {
+          text: '지급예정',
+          width: 100,
+          align: 'center',
+          value: 'phone_number',
+        },
+        {
+          text: '지급여부',
+          width: 100,
+          align: 'center',
+          value: 'phone_number',
         },
       ];
     },
@@ -190,5 +260,13 @@ export default {
 .searchButton {
   width: 100px;
   height: 60px;
+}
+
+.badge {
+  float: left;
+  margin: 0 20px 0 20px;
+}
+.search-toolbar {
+  border-radius: 10px;
 }
 </style>
