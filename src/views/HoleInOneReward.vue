@@ -79,7 +79,7 @@
                 </v-menu>
 
                 <!-- 검색 필터 -->
-                <v-combobox
+                <v-select
                   v-model="filterTargetSelect"
                   :items="filterTargets"
                   hide-details="auto"
@@ -87,7 +87,7 @@
                   label="검색대상"
                   outlined
                   dense
-                ></v-combobox>
+                ></v-select>
                 <v-text-field
                   v-model="filters.searchValue"
                   class="mx-4"
@@ -150,7 +150,7 @@ export default {
     return {
       menu: false,
 
-      filterTargetSelect: { text: '전체', value: '' },
+      filterTargetSelect: '',
       filterTargets: [
         {
           text: '전체',
@@ -283,8 +283,8 @@ export default {
           start_date: this.filters.dates[0],
           end_date: this.filters.dates[1],
         };
-        if (this.filterTargetSelect.value) {
-          filters[this.filterTargetSelect.value] = this.filters.searchValue;
+        if (this.filterTargetSelect) {
+          filters[this.filterTargetSelect] = this.filters.searchValue;
         }
         const pageNumber = this.pagination.page;
 
