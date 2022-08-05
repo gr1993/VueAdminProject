@@ -63,6 +63,11 @@ export default {
       drawer: true,
       items: [
         {
+          title: '코드',
+          icon: 'mdi-note-edit-outline',
+          to: '/admin/code',
+        },
+        {
           title: '사용자',
           icon: 'mdi-account-search-outline',
           to: '/admin/user',
@@ -72,7 +77,11 @@ export default {
           icon: 'mdi-trophy-outline',
           to: '/admin/holeinone/reward',
         },
-        { title: '뉴스', icon: 'mdi-newspaper', to: '/admin/news' },
+        {
+          title: '뉴스',
+          icon: 'mdi-newspaper',
+          to: '/admin/news',
+        },
       ],
       right: null,
     };
