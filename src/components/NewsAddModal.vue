@@ -91,7 +91,7 @@
               </v-col>
               <v-col cols="11" sm="5">
                 <v-menu
-                  ref="menu"
+                  ref="menu2"
                   v-model="menu2"
                   :close-on-content-click="false"
                   :nudge-right="40"
@@ -115,7 +115,7 @@
                     v-if="menu2"
                     v-model="time"
                     full-width
-                    @click:minute="$refs.menu.save(time)"
+                    @click:minute="$refs.menu2.save(time)"
                   ></v-time-picker>
                 </v-menu>
               </v-col>
