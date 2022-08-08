@@ -17,11 +17,15 @@
       show-select
     >
       <template v-slot:[`item.image_path`]="{ item }">
-        <div class="p-2">
-          <a :href="item.image_path" target="_blank">
-            <v-img :src="item.image_path" width="150px" height="150px"> </v-img>
-          </a>
-        </div>
+        <a
+          v-for="(imageLink, i) in getImageLinks(item.image_path)"
+          :key="i"
+          :href="imageLink"
+          target="_blank"
+          class="imageSize imageAtag"
+        >
+          <v-img :src="imageLink" class="imageSize"> </v-img>
+        </a>
       </template>
 
       <template v-slot:[`item.created_at`]="{ item }">
@@ -164,7 +168,7 @@ export default {
         },
         {
           text: '이미지',
-          width: 200,
+          width: 550,
           align: 'center',
           value: 'image_path',
         },
@@ -248,6 +252,16 @@ export default {
       this.SearchNews();
     },
 
+    getImageLinks(linkString) {
+      if (linkString) {
+        const links = linkString.split('#');
+
+        return links;
+      } else {
+        return [];
+      }
+    },
+
     formatDate(value) {
       const formatDate = moment(value).format('YYYY-MM-DD hh:mm:ss');
       if (!formatDate || formatDate === 'Invalid date') return '';
@@ -271,5 +285,13 @@ export default {
 .searchButton {
   width: 100px;
   height: 60px;
+}
+.imageAtag {
+  float: left;
+  margin: 10px;
+}
+.imageSize {
+  width: 150px;
+  height: 150px;
 }
 </style>

@@ -41,13 +41,22 @@
               </v-col>
               <v-col cols="12">
                 <v-file-input
-                  v-model="image"
+                  v-model="images"
                   label="이미지"
                   prepend-icon="mdi-camera"
+                  :multiple="true"
                   @change="fileInputChange"
                 >
                 </v-file-input>
-                <v-img :src="url"></v-img>
+                <div>
+                  <div
+                    v-for="(previewImage, i) in previewFiles"
+                    :key="i"
+                    class="imageSize imageAtag"
+                  >
+                    <v-img :src="previewImage.url" class="imageSize"></v-img>
+                  </div>
+                </div>
               </v-col>
             </v-row>
           </v-container>
@@ -77,8 +86,8 @@ export default {
     writter: '',
     content: '',
 
-    url: null,
-    image: null,
+    previewFiles: [],
+    images: [],
     isChangeImage: '',
   }),
   methods: {
@@ -91,8 +100,8 @@ export default {
       this.writter = '';
       this.content = '';
 
-      this.url = null;
-      this.image = null;
+      this.previewFiles = [];
+      this.images = [];
       this.isChangeImage = '';
     },
 
@@ -129,7 +138,12 @@ export default {
         formData.append('writter', this.writter);
         formData.append('content', this.content);
         formData.append('isChangeImage', this.isChangeImage);
-        formData.append('image', this.image);
+
+        if (this.images) {
+          for (let i = 0; i < this.images.length; i++) {
+            formData.append('images', this.images[i]);
+          }
+        }
 
         const response = await this.$axios.post(
           `${this.hostname}/news/modify`,
@@ -153,6 +167,24 @@ export default {
 
     fileInputChange() {
       this.isChangeImage = 'Y';
+
+      const images = this.images;
+      if (images) {
+        this.previewFiles = [];
+
+        images.forEach((img) => {
+          const fileReader = new FileReader();
+          fileReader.onload = (e) => {
+            const file = {
+              url: e.target.result,
+              name: img.name,
+              size: img.size,
+            };
+            this.previewFiles.push(file);
+          };
+          fileReader.readAsDataURL(img);
+        });
+      }
     },
 
     closeButtonClick() {
