@@ -27,7 +27,13 @@
 
       <template v-slot:[`item.base_document`]="{ item }">
         <div class="p-2">
-          <v-btn color="primary" :value="item.base_document"> 보기 </v-btn>
+          <v-btn
+            color="primary"
+            :value="item.base_document"
+            @click="showImageViewer(item.id)"
+          >
+            보기
+          </v-btn>
         </div>
       </template>
 
@@ -138,14 +144,19 @@
         @input="nextPage"
       ></v-pagination>
     </div>
+    <ImageViewerModal ref="ImageViewer" />
   </v-container>
 </template>
 
 <script>
 import moment from 'moment';
+import ImageViewerModal from '../components/ImageViewerModal.vue';
 
 export default {
   name: 'HoleInOneReward',
+  components: {
+    ImageViewerModal,
+  },
   data() {
     return {
       menu: false,
@@ -315,6 +326,16 @@ export default {
 
       this.pagination.page = 1;
       this.pagination.pages = Math.floor((totalCount - 1) / 10) + 1;
+    },
+
+    showImageViewer(id) {
+      const reward = this.rewardData.find((f) => f.id === id);
+
+      this.$refs.ImageViewer.imageLinks = [
+        reward.certificate_image_path,
+        reward.certifying_shot_image_path,
+      ];
+      this.$refs.ImageViewer.dialog = true;
     },
 
     nextPage() {
