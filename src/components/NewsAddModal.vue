@@ -58,6 +58,67 @@
                   </div>
                 </div>
               </v-col>
+              <v-col cols="12" sm="6" md="4">
+                <v-menu
+                  ref="menu"
+                  v-model="menu"
+                  :close-on-content-click="false"
+                  :return-value.sync="date"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="date"
+                      label="날짜"
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker v-model="date" no-title scrollable>
+                    <v-spacer></v-spacer>
+                    <v-btn text color="primary" @click="menu = false">
+                      Cancel
+                    </v-btn>
+                    <v-btn text color="primary" @click="$refs.menu.save(date)">
+                      OK
+                    </v-btn>
+                  </v-date-picker>
+                </v-menu>
+              </v-col>
+              <v-col cols="11" sm="5">
+                <v-menu
+                  ref="menu"
+                  v-model="menu2"
+                  :close-on-content-click="false"
+                  :nudge-right="40"
+                  :return-value.sync="time"
+                  transition="scale-transition"
+                  offset-y
+                  max-width="290px"
+                  min-width="290px"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="time"
+                      label="시간"
+                      prepend-icon="mdi-clock-time-four-outline"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-time-picker
+                    v-if="menu2"
+                    v-model="time"
+                    full-width
+                    @click:minute="$refs.menu.save(time)"
+                  ></v-time-picker>
+                </v-menu>
+              </v-col>
             </v-row>
           </v-container>
         </v-card-text>
@@ -79,6 +140,13 @@
 export default {
   data: () => ({
     dialog: false,
+
+    date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+      .toISOString()
+      .substr(0, 10),
+    time: null,
+    menu: false,
+    menu2: false,
 
     title: '',
     sub_title: '',
@@ -103,11 +171,18 @@ export default {
 
     async saveButtonClick() {
       try {
+        if (!this.time) {
+          alert('시간을 선택하세요.');
+          return;
+        }
+        const created_at = `${this.date} ${this.time}:00`;
+
         const formData = new FormData();
         formData.append('title', this.title);
         formData.append('sub_title', this.sub_title);
         formData.append('writter', this.writter);
         formData.append('content', this.content);
+        formData.append('created_at', created_at);
 
         if (this.images) {
           for (let i = 0; i < this.images.length; i++) {
