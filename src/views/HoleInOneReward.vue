@@ -58,7 +58,13 @@
               </v-btn>
             </v-col>
             <v-col cols="6">
-              <v-btn color="red" :value="item.manager_confirm"> 거절 </v-btn>
+              <v-btn
+                color="red"
+                :value="item.manager_confirm"
+                @click="managerRejectClick(item.id)"
+              >
+                거절
+              </v-btn>
             </v-col>
           </v-row>
           <span v-if="item.status !== '요청'">
@@ -179,6 +185,10 @@
       ref="ManagerConfirm"
       @SearchHoleInOne="SearchHoleInOne"
     />
+    <HoleInOneRejectModal
+      ref="ManagerReject"
+      @SearchHoleInOne="SearchHoleInOne"
+    />
   </v-container>
 </template>
 
@@ -186,12 +196,14 @@
 import moment from 'moment';
 import ImageViewerModal from '../components/ImageViewerModal.vue';
 import HoleInOneConfirmModal from '../components/HoleInOneConfirmModal.vue';
+import HoleInOneRejectModal from '../components/HoleInOneRejectModal.vue';
 
 export default {
   name: 'HoleInOneReward',
   components: {
     ImageViewerModal,
     HoleInOneConfirmModal,
+    HoleInOneRejectModal,
   },
   data() {
     return {
@@ -232,7 +244,7 @@ export default {
       return [
         {
           text: '상태',
-          width: 80,
+          width: 120,
           align: 'center',
           value: 'status',
         },
@@ -380,6 +392,11 @@ export default {
     managerConfirmClick(id) {
       this.$refs.ManagerConfirm.id = id;
       this.$refs.ManagerConfirm.dialog = true;
+    },
+
+    managerRejectClick(id) {
+      this.$refs.ManagerReject.id = id;
+      this.$refs.ManagerReject.dialog = true;
     },
 
     showImageViewer(id) {
