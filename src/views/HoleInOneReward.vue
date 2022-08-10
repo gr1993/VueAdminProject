@@ -25,6 +25,10 @@
         {{ formatDate(item.tee_off_date) }}
       </template>
 
+      <template v-slot:[`item.time_taken`]="{ item }">
+        {{ getTimeTaken(item.tee_off_date, item.register_date) }}
+      </template>
+
       <template v-slot:[`item.base_document`]="{ item }">
         <div class="p-2">
           <v-btn
@@ -40,6 +44,19 @@
       <template v-slot:[`item.added_document`]="{ item }">
         <div class="p-2">
           <v-btn color="primary" :value="item.added_document"> 보기 </v-btn>
+        </div>
+      </template>
+
+      <template v-slot:[`item.manager_confirm`]="{ item }">
+        <div class="p-2">
+          <v-row>
+            <v-col cols="6">
+              <v-btn color="green" :value="item.manager_confirm"> 확인 </v-btn>
+            </v-col>
+            <v-col cols="6">
+              <v-btn color="red" :value="item.manager_confirm"> 거절 </v-btn>
+            </v-col>
+          </v-row>
         </div>
       </template>
 
@@ -114,22 +131,22 @@
           <v-row>
             <v-col cols="12" align="left">
               <h3 class="badge">
-                <v-badge color="green" content="6"> 전체 </v-badge>
+                <v-badge color="green" content="0"> 전체 </v-badge>
               </h3>
               <h3 class="badge">
-                <v-badge color="black" content="6"> 요청 </v-badge>
+                <v-badge color="black" content="0"> 요청 </v-badge>
               </h3>
               <h3 class="badge">
-                <v-badge color="black" content="6"> 심사중 </v-badge>
+                <v-badge color="black" content="0"> 심사중 </v-badge>
               </h3>
               <h3 class="badge">
-                <v-badge color="red" content="6"> 심사완료(거절) </v-badge>
+                <v-badge color="red" content="0"> 심사완료(거절) </v-badge>
               </h3>
               <h3 class="badge">
-                <v-badge color="blue" content="6"> 심사완료(지급) </v-badge>
+                <v-badge color="blue" content="0"> 심사완료(지급) </v-badge>
               </h3>
               <h3 class="badge">
-                <v-badge color="blue" content="6"> 지급완료 </v-badge>
+                <v-badge color="blue" content="0"> 지급완료 </v-badge>
               </h3>
             </v-col>
           </v-row>
@@ -227,10 +244,17 @@ export default {
         { text: '가입일', width: 120, value: 'register_date' },
         { text: '신청일', width: 120, value: 'created_at' },
         { text: '티오프시간', width: 120, value: 'tee_off_date' },
+        { text: '소요시간', width: 120, value: 'time_taken' },
         {
           text: '기본서류',
           width: 100,
           value: 'base_document',
+          align: 'center',
+        },
+        {
+          text: '담당자확인',
+          width: 150,
+          value: 'manager_confirm',
           align: 'center',
         },
         {
@@ -247,6 +271,12 @@ export default {
         },
         {
           text: '골프존 ID',
+          width: 100,
+          align: 'center',
+          value: 'phone_number',
+        },
+        {
+          text: '지역',
           width: 100,
           align: 'center',
           value: 'phone_number',
@@ -340,6 +370,16 @@ export default {
 
     nextPage() {
       this.SearchHoleInOne();
+    },
+
+    getTimeTaken(tee_off_date, register_date) {
+      const diff = moment(tee_off_date).diff(moment(register_date));
+      const diffDays = moment.duration(diff).asDays();
+      const diffHours = moment.duration(diff).asHours();
+
+      const days = Math.floor(diffDays);
+      const hours = Math.floor(diffHours) - days * 24;
+      return `${days}일 ${hours}시간`;
     },
 
     formatDate(value) {
