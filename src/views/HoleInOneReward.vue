@@ -41,22 +41,35 @@
         </div>
       </template>
 
-      <template v-slot:[`item.added_document`]="{ item }">
-        <div class="p-2">
-          <v-btn color="primary" :value="item.added_document"> 보기 </v-btn>
-        </div>
+      <template v-slot:[`item.golf_field`]="{ item }">
+        {{ getGolfField(item.golf_field, item.golf_hole) }}
       </template>
 
       <template v-slot:[`item.manager_confirm`]="{ item }">
         <div class="p-2">
-          <v-row>
+          <v-row v-if="item.status === '요청'">
             <v-col cols="6">
-              <v-btn color="green" :value="item.manager_confirm"> 확인 </v-btn>
+              <v-btn
+                color="green"
+                :value="item.manager_confirm"
+                @click="managerConfirmClick(item.id)"
+              >
+                확인
+              </v-btn>
             </v-col>
             <v-col cols="6">
               <v-btn color="red" :value="item.manager_confirm"> 거절 </v-btn>
             </v-col>
           </v-row>
+          <span v-if="item.status !== '요청'">
+            {{ getManagerConfirmText(item.id) }}
+          </span>
+        </div>
+      </template>
+
+      <template v-slot:[`item.added_document`]="{ item }">
+        <div class="p-2">
+          <v-btn color="primary" :value="item.added_document"> 보기 </v-btn>
         </div>
       </template>
 
@@ -162,17 +175,23 @@
       ></v-pagination>
     </div>
     <ImageViewerModal ref="ImageViewer" />
+    <HoleInOneConfirmModal
+      ref="ManagerConfirm"
+      @SearchHoleInOne="SearchHoleInOne"
+    />
   </v-container>
 </template>
 
 <script>
 import moment from 'moment';
 import ImageViewerModal from '../components/ImageViewerModal.vue';
+import HoleInOneConfirmModal from '../components/HoleInOneConfirmModal.vue';
 
 export default {
   name: 'HoleInOneReward',
   components: {
     ImageViewerModal,
+    HoleInOneConfirmModal,
   },
   data() {
     return {
@@ -259,27 +278,27 @@ export default {
         },
         {
           text: '구장(코스)',
-          width: 100,
+          width: 120,
           align: 'center',
-          value: 'phone_number',
+          value: 'golf_field',
         },
         {
           text: '업장',
           width: 100,
           align: 'center',
-          value: 'phone_number',
-        },
-        {
-          text: '골프존 ID',
-          width: 100,
-          align: 'center',
-          value: 'phone_number',
+          value: 'golf_screen',
         },
         {
           text: '지역',
           width: 100,
           align: 'center',
-          value: 'phone_number',
+          value: 'golf_area',
+        },
+        {
+          text: '골프존 ID',
+          width: 100,
+          align: 'center',
+          value: 'golfzone_id',
         },
         {
           text: '추가서류',
@@ -358,6 +377,11 @@ export default {
       this.pagination.pages = Math.floor((totalCount - 1) / 10) + 1;
     },
 
+    managerConfirmClick(id) {
+      this.$refs.ManagerConfirm.id = id;
+      this.$refs.ManagerConfirm.dialog = true;
+    },
+
     showImageViewer(id) {
       const reward = this.rewardData.find((f) => f.id === id);
 
@@ -380,6 +404,24 @@ export default {
       const days = Math.floor(diffDays);
       const hours = Math.floor(diffHours) - days * 24;
       return `${days}일 ${hours}시간`;
+    },
+
+    getGolfField(golf_field, golf_hole) {
+      if (!golf_field) return '';
+
+      return golf_field + '/' + golf_hole;
+    },
+
+    getManagerConfirmText(id) {
+      const reward = this.rewardData.find((f) => f.id === id);
+      const confirmLog = reward.logs.find((f) => f.status === '심사중');
+      if (confirmLog) {
+        return `확인(${moment(confirmLog.created_at).format('YY/MM/DD')})`;
+      }
+      const rejectLog = reward.logs.find((f) => f.status === '요청거절');
+      if (rejectLog) {
+        return `거절(${moment(rejectLog.created_at).format('YY/MM/DD')})`;
+      }
     },
 
     formatDate(value) {

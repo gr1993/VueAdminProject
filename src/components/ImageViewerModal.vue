@@ -25,9 +25,6 @@
           <v-btn color="blue darken-1" text @click="closeButtonClick">
             닫기
           </v-btn>
-          <v-btn color="blue darken-1" text @click="saveButtonClick">
-            수정
-          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
