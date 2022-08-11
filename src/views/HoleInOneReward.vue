@@ -75,7 +75,60 @@
 
       <template v-slot:[`item.added_document`]="{ item }">
         <div class="p-2">
-          <v-btn color="primary" :value="item.added_document"> 보기 </v-btn>
+          <v-btn
+            v-if="item.additional_documents_date"
+            color="primary"
+            :value="item.added_document"
+          >
+            보기
+          </v-btn>
+          <v-btn
+            v-if="!item.additional_documents_date"
+            color="primary"
+            disabled
+          >
+            보기
+          </v-btn>
+        </div>
+      </template>
+
+      <template v-slot:[`item.judgment_result`]="{ item }">
+        <div class="p-2">
+          <v-row
+            v-if="item.additional_documents_date && item.status === '심사중'"
+          >
+            <v-col cols="6">
+              <v-btn
+                color="green"
+                :value="item.judgment_result"
+                @click="managerConfirmClick(item.id)"
+              >
+                확인
+              </v-btn>
+            </v-col>
+            <v-col cols="6">
+              <v-btn
+                color="red"
+                :value="item.manager_confirm"
+                @click="managerRejectClick(item.id)"
+              >
+                거절
+              </v-btn>
+            </v-col>
+          </v-row>
+          <span
+            v-if="item.additional_documents_date && item.status !== '심사중'"
+          >
+            {{ getJudgmentResultText(item.id) }}
+          </span>
+          <v-row v-if="!item.additional_documents_date">
+            <v-col cols="6">
+              <v-btn color="green" disabled> 확인 </v-btn>
+            </v-col>
+            <v-col cols="6">
+              <v-btn color="red" disabled> 거절 </v-btn>
+            </v-col>
+          </v-row>
         </div>
       </template>
 
@@ -320,27 +373,27 @@ export default {
         },
         {
           text: '심사결과',
-          width: 100,
+          width: 150,
           align: 'center',
-          value: 'phone_number',
+          value: 'judgment_result',
         },
         {
           text: '심사기한',
           width: 100,
           align: 'center',
-          value: 'phone_number',
+          value: 'judging_deadline_date',
         },
         {
           text: '지급예정',
           width: 100,
           align: 'center',
-          value: 'phone_number',
+          value: 'payment_due_date',
         },
         {
           text: '지급여부',
           width: 100,
           align: 'center',
-          value: 'phone_number',
+          value: 'payment_date',
         },
       ];
     },
@@ -414,12 +467,20 @@ export default {
     },
 
     getTimeTaken(tee_off_date, register_date) {
+      if (
+        !tee_off_date ||
+        !register_date ||
+        tee_off_date === '0000-00-00 00:00:00'
+      )
+        return '';
+
       const diff = moment(tee_off_date).diff(moment(register_date));
       const diffDays = moment.duration(diff).asDays();
       const diffHours = moment.duration(diff).asHours();
 
       const days = Math.floor(diffDays);
       const hours = Math.floor(diffHours) - days * 24;
+
       return `${days}일 ${hours}시간`;
     },
 
@@ -439,6 +500,20 @@ export default {
       if (rejectLog) {
         return `거절(${moment(rejectLog.created_at).format('YY/MM/DD')})`;
       }
+      return '';
+    },
+
+    getJudgmentResultText(id) {
+      const reward = this.rewardData.find((f) => f.id === id);
+      const confirmLog = reward.logs.find((f) => f.status === '심사완료');
+      if (confirmLog) {
+        return `확인(${moment(confirmLog.created_at).format('YY/MM/DD')})`;
+      }
+      const rejectLog = reward.logs.find((f) => f.status === '심사거절');
+      if (rejectLog) {
+        return `거절(${moment(rejectLog.created_at).format('YY/MM/DD')})`;
+      }
+      return '';
     },
 
     formatDate(value) {
