@@ -1,24 +1,17 @@
-# longest-admin
+# 골프 서비스 어드민
 
-## Project setup
-```
-yarn install
-```
+### 목적
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+1. 개인 포트폴리오 용도로 제작
+2. 관리자 페이지 제작
+3. Vue 학습
 
-### Compiles and minifies for production
-```
-yarn build
-```
+### 기술스택
 
-### Lints and fixes files
-```
-yarn lint
-```
+1. Vue
+2. Vuetify
+3. Vuex
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### 예시화면
+
+![로그인](./capture/login.PNG)
