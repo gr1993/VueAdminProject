@@ -8,9 +8,11 @@
 
 ### 기술스택
 
-1. Vue
+1. Vue2
 2. Vuetify
-3. Vuex
+3. Vue-Router
+4. Vuex
+5. 서버는 Node, Express
 
 ### 예시화면
 
