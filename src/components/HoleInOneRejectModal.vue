@@ -3,7 +3,7 @@
     <v-dialog v-model="dialog" persistent max-width="400px">
       <v-card>
         <v-card-title>
-          <span class="text-h5">담당자 거절</span>
+          <span class="text-h5">거절</span>
         </v-card-title>
         <v-card-text>
           <v-container>
@@ -70,7 +70,7 @@ export default {
         this.clearModal();
         this.$emit('SearchHoleInOne');
       } catch {
-        alert('담당자 거절에 실패하였습니다.');
+        alert('거절에 실패하였습니다.');
       }
     },
 
