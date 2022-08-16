@@ -78,7 +78,7 @@
           <v-btn
             v-if="item.additional_documents_date"
             color="primary"
-            :value="item.added_document"
+            @click="showAddedImageViewer(item.id)"
           >
             보기
           </v-btn>
@@ -95,13 +95,19 @@
       <template v-slot:[`item.judgment_result`]="{ item }">
         <div class="p-2">
           <v-row
-            v-if="item.additional_documents_date && item.status === '심사중'"
+            v-if="
+              item.additional_documents_date &&
+              (item.status === '심사중' ||
+                item.status === '심사중1' ||
+                item.status === '심사중2' ||
+                item.status === '심사중3')
+            "
           >
             <v-col cols="6">
               <v-btn
                 color="green"
                 :value="item.judgment_result"
-                @click="managerConfirmClick(item.id)"
+                @click="judgmentConfirmClick(item.id, item.status)"
               >
                 확인
               </v-btn>
@@ -110,7 +116,7 @@
               <v-btn
                 color="red"
                 :value="item.manager_confirm"
-                @click="managerRejectClick(item.id)"
+                @click="judgmentRejectClick(item.id)"
               >
                 거절
               </v-btn>
@@ -234,12 +240,13 @@
       ></v-pagination>
     </div>
     <ImageViewerModal ref="ImageViewer" />
-    <HoleInOneConfirmModal
-      ref="ManagerConfirm"
-      @SearchHoleInOne="SearchHoleInOne"
-    />
+    <HoleInOneModal ref="ManagerConfirm" @SearchHoleInOne="SearchHoleInOne" />
     <HoleInOneRejectModal
       ref="ManagerReject"
+      @SearchHoleInOne="SearchHoleInOne"
+    />
+    <HoleInOneButtonModal
+      ref="JudgmentConfirm"
       @SearchHoleInOne="SearchHoleInOne"
     />
   </v-container>
@@ -248,14 +255,16 @@
 <script>
 import moment from 'moment';
 import ImageViewerModal from '../components/ImageViewerModal.vue';
-import HoleInOneConfirmModal from '../components/HoleInOneConfirmModal.vue';
+import HoleInOneModal from '../components/HoleInOneModal.vue';
+import HoleInOneButtonModal from '../components/HoleInOneButtonModal.vue';
 import HoleInOneRejectModal from '../components/HoleInOneRejectModal.vue';
 
 export default {
   name: 'HoleInOneReward',
   components: {
     ImageViewerModal,
-    HoleInOneConfirmModal,
+    HoleInOneModal,
+    HoleInOneButtonModal,
     HoleInOneRejectModal,
   },
   data() {
@@ -452,6 +461,18 @@ export default {
       this.$refs.ManagerReject.dialog = true;
     },
 
+    judgmentConfirmClick(id, status) {
+      this.$refs.JudgmentConfirm.id = id;
+      this.$refs.JudgmentConfirm.status = status;
+      this.$refs.JudgmentConfirm.dialog = true;
+    },
+
+    judgmentRejectClick(id) {
+      this.$refs.ManagerReject.id = id;
+      this.$refs.ManagerReject.url = 'holeinone/judgment/reject';
+      this.$refs.ManagerReject.dialog = true;
+    },
+
     showImageViewer(id) {
       const reward = this.rewardData.find((f) => f.id === id);
 
@@ -459,6 +480,23 @@ export default {
         reward.certificate_image_path,
         reward.certifying_shot_image_path,
       ];
+      this.$refs.ImageViewer.dialog = true;
+    },
+
+    showAddedImageViewer(id) {
+      const reward = this.rewardData.find((f) => f.id === id);
+      const imageLinks = [];
+      if (reward.idcard_image_path) {
+        imageLinks.push(reward.idcard_image_path);
+      }
+      if (reward.bankbook_image_path) {
+        imageLinks.push(reward.bankbook_image_path);
+      }
+      if (reward.scorecard_image_path) {
+        imageLinks.push(reward.scorecard_image_path);
+      }
+
+      this.$refs.ImageViewer.imageLinks = imageLinks;
       this.$refs.ImageViewer.dialog = true;
     },
 

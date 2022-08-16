@@ -36,16 +36,17 @@
 
 <script>
 export default {
-  props: ['email'],
   data: () => ({
     dialog: false,
 
+    url: '',
     reject_reason: '',
   }),
   methods: {
     clearModal() {
       this.dialog = false;
 
+      this.url = '';
       this.reject_reason = '';
     },
 
@@ -57,7 +58,9 @@ export default {
         };
 
         const response = await this.$axios.post(
-          `${this.hostname}/holeinone/manager/reject`,
+          this.url
+            ? `${this.hostname}/${this.url}`
+            : `${this.hostname}/holeinone/manager/reject`,
           body
         );
         const { isSuccess, message } = response.data;
