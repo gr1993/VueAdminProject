@@ -127,10 +127,27 @@
             </v-col>
           </v-row>
           <span
-            v-if="item.additional_documents_date && item.status !== '심사중'"
+            v-if="
+              item.additional_documents_date &&
+              item.status !== '심사거절' &&
+              item.status !== '심사중' &&
+              item.status !== '심사중1' &&
+              item.status !== '심사중2' &&
+              item.status !== '심사중3'
+            "
           >
-            {{ getJudgmentResultText(item.id) }}
+            발송완료
           </span>
+          <v-row
+            v-if="item.additional_documents_date && item.status === '심사거절'"
+          >
+            <v-col cols="1"></v-col>
+            <v-col cols="4">
+              <v-btn color="error" @click="showJudgmentRejectReason(item.id)">
+                사유확인
+              </v-btn>
+            </v-col>
+          </v-row>
           <v-row v-if="!item.additional_documents_date">
             <v-col cols="6">
               <v-btn color="green" disabled> 확인 </v-btn>
@@ -617,6 +634,14 @@ export default {
         return `거절(${moment(rejectLog.created_at).format('YY/MM/DD')})`;
       }
       return '';
+    },
+
+    showJudgmentRejectReason(id) {
+      const reward = this.rewardData.find((f) => f.id === id);
+      const rejectLog = reward.logs.find((f) => f.status === '심사거절');
+      if (rejectLog) {
+        alert(rejectLog.description);
+      }
     },
 
     formatDate(value) {
