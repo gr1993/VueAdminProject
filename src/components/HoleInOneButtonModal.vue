@@ -63,6 +63,49 @@
                 >
               </v-col>
             </v-row>
+            <v-row v-if="status === '심사중3'">
+              <v-col cols="12">
+                <v-text-field
+                  v-model="holeinone_count"
+                  label="홀인원 횟수"
+                  type="number"
+                  outlined
+                  hide-details
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="same_store_count"
+                  label="동일매장 이용"
+                  type="number"
+                  outlined
+                  hide-details
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="holeinone_per_month"
+                  label="한달 내 홀인원"
+                  type="number"
+                  outlined
+                  hide-details
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <span>동반자 여부</span>
+                <v-radio-group v-model="is_companion" row>
+                  <v-radio label="있음" value="1"></v-radio>
+                  <v-radio label="없음" value="0"></v-radio>
+                </v-radio-group>
+              </v-col>
+              <v-col cols="12">
+                <span>탈퇴 여부</span>
+                <v-radio-group v-model="is_holeinone_withdraw" row>
+                  <v-radio label="유지" value="0"></v-radio>
+                  <v-radio label="탈퇴" value="1"></v-radio>
+                </v-radio-group>
+              </v-col>
+            </v-row>
           </v-container>
         </v-card-text>
         <v-card-actions>
@@ -99,6 +142,12 @@ export default {
 
     id: '',
     status: '',
+
+    is_holeinone_withdraw: '0',
+    holeinone_count: '',
+    same_store_count: '',
+    holeinone_per_month: '',
+    is_companion: '1',
   }),
   methods: {
     clearModal() {
@@ -106,6 +155,12 @@ export default {
 
       this.id = '';
       this.status = '';
+
+      this.is_holeinone_withdraw = '0';
+      this.holeinone_count = '';
+      this.same_store_count = '';
+      this.holeinone_per_month = '';
+      this.is_companion = '1';
     },
 
     async updateStatusClick(msgText, changeStatus) {
@@ -134,11 +189,28 @@ export default {
 
     async saveButtonClick() {
       try {
+        if (
+          !this.is_holeinone_withdraw ||
+          !this.holeinone_count ||
+          !this.same_store_count ||
+          !this.holeinone_per_month ||
+          !this.is_companion
+        ) {
+          alert('모두 입력하세요.');
+          return;
+        }
+
         const result = window.confirm('심사완료상태로 저장하시겠습니까?');
 
         if (result) {
           const body = {
             id: this.id,
+
+            is_holeinone_withdraw: this.is_holeinone_withdraw,
+            holeinone_count: this.holeinone_count,
+            same_store_count: this.same_store_count,
+            holeinone_per_month: this.holeinone_per_month,
+            is_companion: this.is_companion,
           };
 
           const response = await this.$axios.post(

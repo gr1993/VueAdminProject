@@ -190,6 +190,14 @@
         {{ formatDate(item.payment_date) }}
       </template>
 
+      <template v-slot:[`item.is_holeinone_withdraw`]="{ item }">
+        {{ getBooleanText(item.is_holeinone_withdraw) }}
+      </template>
+
+      <template v-slot:[`item.is_companion`]="{ item }">
+        {{ getBooleanText(item.is_companion) }}
+      </template>
+
       <template v-slot:top>
         <v-container fluid>
           <v-row class="searchRow">
@@ -486,6 +494,36 @@ export default {
           align: 'center',
           value: 'payment_date',
         },
+        {
+          text: '탈퇴여부',
+          width: 120,
+          align: 'center',
+          value: 'is_holeinone_withdraw',
+        },
+        {
+          text: '홀인원 횟수',
+          width: 150,
+          align: 'center',
+          value: 'holeinone_count',
+        },
+        {
+          text: '동일매장 이용',
+          width: 150,
+          align: 'center',
+          value: 'same_store_count',
+        },
+        {
+          text: '한달 내 홀인원',
+          width: 150,
+          align: 'center',
+          value: 'holeinone_per_month',
+        },
+        {
+          text: '동반자 여부',
+          width: 150,
+          align: 'center',
+          value: 'is_companion',
+        },
       ];
     },
     dateRangeText() {
@@ -673,6 +711,12 @@ export default {
         return `거절(${moment(rejectLog.created_at).format('YY/MM/DD')})`;
       }
       return '';
+    },
+
+    getBooleanText(number) {
+      if (number == null) return '';
+
+      return number && number === 1 ? '예' : '아니요';
     },
 
     showJudgmentRejectReason(id) {
