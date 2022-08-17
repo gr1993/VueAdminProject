@@ -92,6 +92,10 @@
         </div>
       </template>
 
+      <template v-slot:[`item.additional_documents_date`]="{ item }">
+        {{ formatDate(item.additional_documents_date) }}
+      </template>
+
       <template v-slot:[`item.judgment_result`]="{ item }">
         <div class="p-2">
           <v-row
@@ -136,6 +140,33 @@
             </v-col>
           </v-row>
         </div>
+      </template>
+
+      <template v-slot:[`item.judging_deadline_date`]="{ item }">
+        {{ formatOnlyDate(item.judging_deadline_date) }}
+      </template>
+
+      <template v-slot:[`item.payment_due_date`]="{ item }">
+        {{ formatOnlyDate(item.payment_due_date) }}
+      </template>
+
+      <template v-slot:[`item.is_payment`]="{ item }">
+        <div v-if="item.status === '심사완료'" class="p-2">
+          <v-row v-if="!item.payment_date">
+            <v-col cols="12">
+              <v-btn color="green" @click="paymentCompleteClick(item.id)">
+                지급
+              </v-btn>
+            </v-col>
+          </v-row>
+        </div>
+        <span v-if="item.status === '지급완료' && item.payment_date">
+          완료
+        </span>
+      </template>
+
+      <template v-slot:[`item.payment_date`]="{ item }">
+        {{ formatDate(item.payment_date) }}
       </template>
 
       <template v-slot:top>
@@ -381,6 +412,12 @@ export default {
           value: 'added_document',
         },
         {
+          text: '추가서류 접수일',
+          width: 150,
+          align: 'center',
+          value: 'additional_documents_date',
+        },
+        {
           text: '심사결과',
           width: 150,
           align: 'center',
@@ -388,19 +425,25 @@ export default {
         },
         {
           text: '심사기한',
-          width: 100,
+          width: 120,
           align: 'center',
           value: 'judging_deadline_date',
         },
         {
           text: '지급예정',
-          width: 100,
+          width: 120,
           align: 'center',
           value: 'payment_due_date',
         },
         {
           text: '지급여부',
           width: 100,
+          align: 'center',
+          value: 'is_payment',
+        },
+        {
+          text: '지급일',
+          width: 150,
           align: 'center',
           value: 'payment_date',
         },
@@ -471,6 +514,28 @@ export default {
       this.$refs.ManagerReject.id = id;
       this.$refs.ManagerReject.url = 'holeinone/judgment/reject';
       this.$refs.ManagerReject.dialog = true;
+    },
+
+    async paymentCompleteClick(id) {
+      try {
+        const result = window.confirm('지급완료상태로 저장하시겠습니까?');
+
+        if (result) {
+          const body = { id };
+
+          const response = await this.$axios.post(
+            `${this.hostname}/holeinone/payment/complete`,
+            body
+          );
+          const { isSuccess, message } = response.data;
+          alert(message);
+          if (!isSuccess) return;
+
+          this.SearchHoleInOne();
+        }
+      } catch {
+        alert('지급완료에 실패하였습니다.');
+      }
     },
 
     showImageViewer(id) {
@@ -556,6 +621,12 @@ export default {
 
     formatDate(value) {
       const formatDate = moment(value).format('YYYY-MM-DD HH:mm:ss');
+      if (!formatDate || formatDate === 'Invalid date') return '';
+      return formatDate;
+    },
+
+    formatOnlyDate(value) {
+      const formatDate = moment(value).format('YYYY/MM/DD');
       if (!formatDate || formatDate === 'Invalid date') return '';
       return formatDate;
     },
