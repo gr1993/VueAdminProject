@@ -17,3 +17,7 @@
 ### 예시화면
 
 ![로그인](./capture/login.PNG)
+![코드](./capture/code.PNG)
+![사용자](./capture/user.PNG)
+![뉴스1](./capture/news.PNG)
+![뉴스2](./capture/news2.PNG)
