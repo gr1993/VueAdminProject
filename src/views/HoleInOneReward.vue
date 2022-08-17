@@ -1,6 +1,9 @@
 <template>
   <v-container fluid>
     <v-data-table
+      v-model="selected"
+      :single-select="true"
+      show-select
       :headers="headers"
       :items="rewardData"
       item-key="id"
@@ -12,6 +15,7 @@
       :hide-default-header="false"
       :hide-default-footer="true"
       :disable-pagination="true"
+      disable-sort
     >
       <template v-slot:[`item.register_date`]="{ item }">
         {{ formatDate(item.register_date) }}
@@ -276,6 +280,17 @@
               </h3>
             </v-col>
           </v-row>
+          <v-row>
+            <v-col cols="12" align="right">
+              <v-btn
+                color="green"
+                style="margin-right: 10px"
+                @click="typeChangeButtonClick"
+              >
+                구분 변경
+              </v-btn>
+            </v-col>
+          </v-row>
         </v-container>
       </template>
     </v-data-table>
@@ -297,6 +312,10 @@
       ref="JudgmentConfirm"
       @SearchHoleInOne="SearchHoleInOne"
     />
+    <HoleInOneTypeModal
+      ref="TypeChangeModal"
+      @SearchHoleInOne="SearchHoleInOne"
+    />
   </v-container>
 </template>
 
@@ -306,6 +325,7 @@ import ImageViewerModal from '../components/ImageViewerModal.vue';
 import HoleInOneModal from '../components/HoleInOneModal.vue';
 import HoleInOneButtonModal from '../components/HoleInOneButtonModal.vue';
 import HoleInOneRejectModal from '../components/HoleInOneRejectModal.vue';
+import HoleInOneTypeModal from '../components/HoleInOneTypeModal.vue';
 
 export default {
   name: 'HoleInOneReward',
@@ -314,9 +334,11 @@ export default {
     HoleInOneModal,
     HoleInOneButtonModal,
     HoleInOneRejectModal,
+    HoleInOneTypeModal,
   },
   data() {
     return {
+      selected: [],
       menu: false,
 
       filterTargetSelect: '',
@@ -509,6 +531,23 @@ export default {
 
       this.pagination.page = 1;
       this.pagination.pages = Math.floor((totalCount - 1) / 10) + 1;
+    },
+
+    typeChangeButtonClick() {
+      if (this.selected[0]) {
+        const selectedReword = this.selected[0];
+
+        this.$refs.TypeChangeModal.id = selectedReword.id;
+        this.$refs.TypeChangeModal.status = selectedReword.status;
+        this.$refs.TypeChangeModal.name = selectedReword.name;
+        this.$refs.TypeChangeModal.hole_in_one_membership_id =
+          selectedReword.hole_in_one_membership_id;
+        this.$refs.TypeChangeModal.type = selectedReword.type;
+
+        this.$refs.TypeChangeModal.dialog = true;
+      } else {
+        alert('상금신청을 선택하세요');
+      }
     },
 
     managerConfirmClick(id) {

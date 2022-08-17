@@ -15,6 +15,7 @@
       :hide-default-footer="true"
       :disable-pagination="true"
       show-select
+      disable-sort
     >
       <template v-slot:[`item.created_at`]="{ item }">
         {{ formatDate(item.created_at) }}
