@@ -269,22 +269,39 @@
           <v-row>
             <v-col cols="12" align="left">
               <h3 class="badge">
-                <v-badge color="green" content="0"> 전체 </v-badge>
+                <v-badge color="green" :content="statusList.total">
+                  전체
+                </v-badge>
               </h3>
               <h3 class="badge">
-                <v-badge color="black" content="0"> 요청 </v-badge>
+                <v-badge color="black" :content="statusList.request">
+                  요청
+                </v-badge>
               </h3>
               <h3 class="badge">
-                <v-badge color="black" content="0"> 심사중 </v-badge>
+                <v-badge color="red" :content="statusList.requestReject">
+                  요청거절
+                </v-badge>
               </h3>
               <h3 class="badge">
-                <v-badge color="red" content="0"> 심사완료(거절) </v-badge>
+                <v-badge color="black" :content="statusList.judgment">
+                  심사중
+                </v-badge>
               </h3>
               <h3 class="badge">
-                <v-badge color="blue" content="0"> 심사완료(지급) </v-badge>
+                <v-badge color="red" :content="statusList.judgmentReject">
+                  심사거절
+                </v-badge>
               </h3>
               <h3 class="badge">
-                <v-badge color="blue" content="0"> 지급완료 </v-badge>
+                <v-badge color="blue" :content="statusList.judgmentComplete">
+                  심사완료
+                </v-badge>
+              </h3>
+              <h3 class="badge">
+                <v-badge color="blue" :content="statusList.paymentComplete">
+                  지급완료
+                </v-badge>
               </h3>
             </v-col>
           </v-row>
@@ -374,6 +391,15 @@ export default {
       },
 
       rewardData: [],
+      statusList: {
+        total: '0',
+        request: '0',
+        requestReject: '0',
+        judgment: '0',
+        judgmentComplete: '0',
+        judgmentReject: '0',
+        paymentComplete: '0',
+      },
     };
   },
   created() {
@@ -556,11 +582,74 @@ export default {
         }
 
         this.rewardData = data.holeInOneRewards;
+        this.getStatusList(filters);
         return totalCount;
       } catch (error) {
         alert(error.message);
         console.log(error);
         alert('상금지급 검색에 실패하였습니다.');
+      }
+    },
+
+    async getStatusList(filters) {
+      const response = await this.$axios.get(
+        `${this.hostname}/holeinone/status/list`,
+        {
+          params: {
+            filters,
+          },
+        }
+      );
+      const { isSuccess, data, message } = response.data;
+
+      if (!isSuccess) {
+        alert(message);
+        return;
+      }
+
+      const list = data.statusList;
+      if (list && list.length) {
+        this.statusList.total = list
+          .reduce((acc, cur) => acc + cur.count, 0)
+          .toString();
+
+        const request = list.find((f) => f.status === '요청');
+        this.statusList.request = request ? request.count.toString() : '0';
+
+        const requestReject = list.find((f) => f.status === '요청거절');
+        this.statusList.requestReject = requestReject
+          ? requestReject.count.toString()
+          : '0';
+
+        const judgment = list.find((f) => f.status === '심사중');
+        const judgment1 = list.find((f) => f.status === '심사중1');
+        const judgment2 = list.find((f) => f.status === '심사중2');
+        const judgment3 = list.find((f) => f.status === '심사중3');
+        const sumJudgment = [
+          judgment ? judgment.count : 0,
+          judgment1 ? judgment1.count : 0,
+          judgment2 ? judgment2.count : 0,
+          judgment3 ? judgment3.count : 0,
+        ];
+        this.statusList.judgment =
+          sumJudgment && sumJudgment.length > 0
+            ? sumJudgment.reduce((acc, count) => acc + count, 0).toString()
+            : '0';
+
+        const judgmentReject = list.find((f) => f.status === '심사거절');
+        this.statusList.judgmentReject = judgmentReject
+          ? judgmentReject.count.toString()
+          : '0';
+
+        const judgmentComplete = list.find((f) => f.status === '심사완료');
+        this.statusList.judgmentComplete = judgmentComplete
+          ? judgmentComplete.count.toString()
+          : '0';
+
+        const paymentComplete = list.find((f) => f.status === '지급완료');
+        this.statusList.paymentComplete = paymentComplete
+          ? paymentComplete.count.toString()
+          : '0';
       }
     },
 
