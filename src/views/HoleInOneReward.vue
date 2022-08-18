@@ -268,37 +268,37 @@
           </v-row>
           <v-row>
             <v-col cols="12" align="left">
-              <h3 class="badge">
+              <h3 class="badge" @click="searchButtonClick">
                 <v-badge color="green" :content="statusList.total">
                   전체
                 </v-badge>
               </h3>
-              <h3 class="badge">
+              <h3 class="badge" @click="statusBadgeClick('요청')">
                 <v-badge color="black" :content="statusList.request">
                   요청
                 </v-badge>
               </h3>
-              <h3 class="badge">
+              <h3 class="badge" @click="statusBadgeClick('요청거절')">
                 <v-badge color="red" :content="statusList.requestReject">
                   요청거절
                 </v-badge>
               </h3>
-              <h3 class="badge">
+              <h3 class="badge" @click="statusBadgeClick('심사중')">
                 <v-badge color="black" :content="statusList.judgment">
                   심사중
                 </v-badge>
               </h3>
-              <h3 class="badge">
+              <h3 class="badge" @click="statusBadgeClick('심사거절')">
                 <v-badge color="red" :content="statusList.judgmentReject">
                   심사거절
                 </v-badge>
               </h3>
-              <h3 class="badge">
+              <h3 class="badge" @click="statusBadgeClick('심사완료')">
                 <v-badge color="blue" :content="statusList.judgmentComplete">
                   심사완료
                 </v-badge>
               </h3>
-              <h3 class="badge">
+              <h3 class="badge" @click="statusBadgeClick('지급완료')">
                 <v-badge color="blue" :content="statusList.paymentComplete">
                   지급완료
                 </v-badge>
@@ -384,6 +384,7 @@ export default {
       filters: {
         dates: ['2022-01-01', '2022-01-01'],
         searchValue: '',
+        status: '',
       },
       pagination: {
         page: 1,
@@ -566,6 +567,10 @@ export default {
         if (this.filterTargetSelect) {
           filters[this.filterTargetSelect] = this.filters.searchValue;
         }
+        if (this.filters.status) {
+          filters.status = this.filters.status;
+        }
+
         const pageNumber = this.pagination.page;
 
         const response = await this.$axios.get(`${this.hostname}/holeinone`, {
@@ -581,6 +586,7 @@ export default {
           return;
         }
 
+        this.selected = [];
         this.rewardData = data.holeInOneRewards;
         this.getStatusList(filters);
         return totalCount;
@@ -654,6 +660,17 @@ export default {
     },
 
     async searchButtonClick() {
+      this.filters.status = '';
+
+      const totalCount = await this.SearchHoleInOne();
+
+      this.pagination.page = 1;
+      this.pagination.pages = Math.floor((totalCount - 1) / 10) + 1;
+    },
+
+    async statusBadgeClick(status) {
+      this.filters.status = status;
+
       const totalCount = await this.SearchHoleInOne();
 
       this.pagination.page = 1;
@@ -850,6 +867,7 @@ export default {
 .badge {
   float: left;
   margin: 0 20px 0 20px;
+  cursor: pointer;
 }
 .search-toolbar {
   border-radius: 10px;
