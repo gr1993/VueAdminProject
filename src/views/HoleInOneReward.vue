@@ -314,6 +314,13 @@
               >
                 구분 변경
               </v-btn>
+              <v-btn
+                color="primary"
+                style="margin-right: 10px"
+                @click="downloadExcel"
+              >
+                엑셀다운로드
+              </v-btn>
             </v-col>
           </v-row>
         </v-container>
@@ -675,6 +682,43 @@ export default {
 
       this.pagination.page = 1;
       this.pagination.pages = Math.floor((totalCount - 1) / 10) + 1;
+    },
+
+    async downloadExcel() {
+      try {
+        const filters = {
+          start_date: this.filters.dates[0],
+          end_date: this.filters.dates[1],
+        };
+        if (this.filterTargetSelect) {
+          filters[this.filterTargetSelect] = this.filters.searchValue;
+        }
+        if (this.filters.status) {
+          filters.status = this.filters.status;
+        }
+
+        const response = await this.$axios.get(
+          `${this.hostname}/holeinone/excel/download`,
+          {
+            params: {
+              filters,
+            },
+            responseType: 'blob',
+          }
+        );
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute(
+          'download',
+          `${moment().format('YYYYMMDDHHmmss')}_상급지급.xlsx`
+        );
+        document.body.appendChild(link);
+        link.click();
+      } catch {
+        alert('엑셀다운로드에 실패하였습니다.');
+      }
     },
 
     typeChangeButtonClick() {
